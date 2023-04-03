@@ -29,7 +29,8 @@ export default function LoginMiddle(): JSX.Element {
 
   return (
     <S.Container>
-      <S.Wrapper
+      <S.Wrapper>
+        {/* test */}
         <form onSubmit={wrapAsync(handleSubmit(onClickLogin))}>
           <S.Title>
             <h1>로그인</h1>
