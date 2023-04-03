@@ -19,6 +19,9 @@ export const useClickUpdateBoard = (): IUseClickUpdateBoard => {
               ?.filter((el: any) => el.restaurantName !== "상호명")
               .map(
                 ({
+
+                  // eslint-disable-next-line @typescript-eslint/naming-convention
+
                   __typename,
                   ...rest
                 }: {
