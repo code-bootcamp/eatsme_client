@@ -7,6 +7,8 @@ import {
   useRef,
   useState,
 } from "react";
+import { useRecoilState } from "recoil";
+import { mapState, markerState } from "../../../../../commons/stores";
 import {
   ICreateBoardInput,
   IQuery,
@@ -18,7 +20,10 @@ import { useEffectTMapLoad } from "../../../../commons/hooks/custom/useEffectTMa
 import { useSetIsToggle } from "../../../../commons/hooks/custom/useSetIsToggle";
 import { mapFindRoad } from "../../../../commons/libraries/mapFindRoad";
 import { mapMarker } from "../../../../commons/libraries/mapMarker";
-import { mapSearch } from "../../../../commons/libraries/mapSearch";
+import {
+  mapSearch,
+  onClickMapSearch,
+} from "../../../../commons/libraries/onClickMapSearch";
 import * as S from "./routeWriteTopStyles";
 
 export interface ISlideSetting {
@@ -58,114 +63,120 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
     disabled_prev: true,
   });
 
-  useEffectTMapLoad({
-    isSearch: false,
-    isSet: props.isSet,
-    data: props.path,
-    isWrite: true,
-    setMap: props.setMap,
-    marker: pickMarker,
-    setMarker: setPickMarker,
-    findLine,
-    setFindLine,
-    setInfoWindow,
-    setSlideSetting,
-    slideSetting,
-    map: props.map,
-    setPath: props.setPath,
-  });
+  const [map, setMap] = useRecoilState(mapState);
+  const { onClickSearch } = onClickMapSearch();
 
-  useEffect(() => {
-    if (marker.length !== 0) {
-      marker.map((el) => el.setMap(null));
-      mapMarker({
-        data: props.path,
-        isSearch: false,
-        isWrite: true,
-        map: props.map,
-        setMap: props.setMap,
-        marker: pickMarker,
-        setMarker: setPickMarker,
-        setInfoWindow,
-        slideSetting,
-        setSlideSetting,
-        setPath: props.setPath,
-      });
-    } else if (marker.length === 0 && pickMarker.length !== 0) {
-      mapMarker({
-        data: props.path,
-        isSearch: false,
-        isWrite: true,
-        map: props.map,
-        setMap: props.setMap,
-        marker: pickMarker,
-        setMarker: setPickMarker,
-        setInfoWindow,
-        slideSetting,
-        setSlideSetting,
-        setPath: props.setPath,
-      });
-    }
-    if (props.path?.info?.[1].restaurantName !== "상호명") {
-      mapFindRoad({
-        data: props.path,
-        isWrite: true,
-        map: props.map,
-        findLine,
-        setFindLine,
-      });
-    } else {
-      findLine.map((el) => el.setMap(null));
-      setFindLine([]);
-    }
+  useEffectTMapLoad(setMap);
+  // useEffectTMapLoad({
+  //   isSearch: false,
+  //   isSet: props.isSet,
+  //   data: props.path,
+  //   isWrite: true,
+  //   setMap: props.setMap,
+  //   marker: pickMarker,
+  //   setMarker: setPickMarker,
+  //   findLine,
+  //   setFindLine,
+  //   setInfoWindow,
+  //   setSlideSetting,
+  //   slideSetting,
+  //   map: props.map,
+  //   setPath: props.setPath,
+  // });
 
-    if (
-      slideSetting.nowPage !== 0 &&
-      props.path?.info?.[slideSetting.nowPage - 1].restaurantName !== "상호명"
-    ) {
-      if (slideSetting.nowPage + 1 < 6 && slideSetting.nowPage !== 0) {
-        setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
-      }
-      if (slideSetting.nowPage >= 2) {
-        setSlideSetting((prev) => ({ ...prev, isActive: false }));
-      }
-    } else if (slideSetting.nowPage === 0 && props.path.title !== "") {
-      if (props.isEdit && props.path?.info?.[1].restaurantName !== "상호명") {
-        setSlideSetting((prev) => ({
-          ...prev,
-          isActive: false,
-        }));
-      }
-      setSlideSetting((prev) => ({
-        ...prev,
-        disabled_next: false,
-        disabled_prev: true,
-      }));
-    } else {
-      setSlideSetting((prev) => ({
-        ...prev,
-        disabled_next: true,
-        isActive: true,
-      }));
-    }
-  }, [props.path.info]);
+  // useEffect(() => {
+  //   if (marker.length !== 0) {
+  //     marker.map((el) => el.setMap(null));
+  //     mapMarker({
+  //       data: props.path,
+  //       isSearch: false,
+  //       isWrite: true,
+  //       map: props.map,
+  //       setMap: props.setMap,
+  //       marker: pickMarker,
+  //       setMarker: setPickMarker,
+  //       setInfoWindow,
+  //       slideSetting,
+  //       setSlideSetting,
+  //       setPath: props.setPath,
+  //     });
+  //   } else if (marker.length === 0 && pickMarker.length !== 0) {
+  //     mapMarker({
+  //       data: props.path,
+  //       isSearch: false,
+  //       isWrite: true,
+  //       map: props.map,
+  //       setMap: props.setMap,
+  //       marker: pickMarker,
+  //       setMarker: setPickMarker,
+  //       setInfoWindow,
+  //       slideSetting,
+  //       setSlideSetting,
+  //       setPath: props.setPath,
+  //     });
+  //   }
+  //   if (props.path?.info?.[1].restaurantName !== "상호명") {
+  //     mapFindRoad({
+  //       data: props.path,
+  //       isWrite: true,
+  //       map: props.map,
+  //       findLine,
+  //       setFindLine,
+  //     });
+  //   } else {
+  //     findLine.map((el) => el.setMap(null));
+  //     setFindLine([]);
+  //   }
 
-  useEffect(() => {
-    if (infoWindow.length > 1) {
-      infoWindow[0].setMap(null);
-      setInfoWindow([infoWindow[1]]);
-    }
-  }, [infoWindow]);
+  //   if (
+  //     slideSetting.nowPage !== 0 &&
+  //     props.path?.info?.[slideSetting.nowPage - 1].restaurantName !== "상호명"
+  //   ) {
+  //     if (slideSetting.nowPage + 1 < 6 && slideSetting.nowPage !== 0) {
+  //       setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
+  //     }
+  //     if (slideSetting.nowPage >= 2) {
+  //       setSlideSetting((prev) => ({ ...prev, isActive: false }));
+  //     }
+  //   } else if (slideSetting.nowPage === 0 && props.path.title !== "") {
+  //     if (props.isEdit && props.path?.info?.[1].restaurantName !== "상호명") {
+  //       setSlideSetting((prev) => ({
+  //         ...prev,
+  //         isActive: false,
+  //       }));
+  //     }
+  //     setSlideSetting((prev) => ({
+  //       ...prev,
+  //       disabled_next: false,
+  //       disabled_prev: true,
+  //     }));
+  //   } else {
+  //     setSlideSetting((prev) => ({
+  //       ...prev,
+  //       disabled_next: true,
+  //       isActive: true,
+  //     }));
+  //   }
+  // }, [props.path.info]);
+
+  // useEffect(() => {
+  //   if (infoWindow.length > 1) {
+  //     infoWindow[0].setMap(null);
+  //     setInfoWindow([infoWindow[1]]);
+  //   }
+  // }, [infoWindow]);
 
   const onChangeInput =
     (pageNum: number) => (event: ChangeEvent<HTMLInputElement>) => {
       if (pageNum === 0) {
+        // 코스 이름 작성
         props.setPath((prev: ICreateBoardInput) => ({
           ...prev,
           title: event.target.value,
         }));
         setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
       } else if (event.target.id === "recommend") {
+        // 추천 메뉴 작성
         props.setPath((prev: ICreateBoardInput) => ({
           ...prev,
           info: prev.info.map((el, idx) => {
@@ -178,6 +189,7 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
           }),
         }));
       } else {
+        // 검색 키워드 작성
         setSlideSetting((prev) => ({
           ...prev,
           keyword: prev.keyword.map((el, idx) => {
@@ -297,22 +309,7 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
                     value={slideSetting.keyword[idx - 1]}
                   />
                   <button
-                    onClick={mapSearch({
-                      map: props.map,
-                      setMap: props.setMap,
-                      keyword: slideSetting.keyword[idx - 1],
-                      idx: idx - 1,
-                      path: props.path ?? "",
-                      setPath: props.setPath,
-                      marker,
-                      setMarker,
-                      infoWindow,
-                      setInfoWindow,
-                      isSearch: true,
-                      setSlideSetting,
-                      // 에러떠서 속성추가
-                      slideSetting: undefined,
-                    })}
+                    onClick={onClickSearch(slideSetting.keyword[idx - 1])}
                   ></button>
                 </S.SearchWrap>
                 <S.StoreWrap>

@@ -37,3 +37,30 @@ export const boardIdState = atom({
   key: "boardIdState",
   default: "",
 });
+
+export const mapState = atom({
+  key: "mapState",
+  default: {} as any,
+  dangerouslyAllowMutability: true,
+});
+
+export const markerState = atom({
+  key: "markerState",
+  default: [] as any,
+  dangerouslyAllowMutability: true,
+});
+
+export const pickMarkerState = atom({
+  key: "pickMarkerState",
+  default: [] as any,
+});
+
+export const infoWindowState = atom({
+  key: "infoWindowState",
+  default: [] as any,
+});
+
+export const findLineState = atom({
+  key: "findLineState",
+  default: [] as any,
+});
