@@ -1,4 +1,4 @@
-import { ICreateBoardInput } from "./../../../../commons/types/generated/types";
+import { ICreateBoardInput } from "../../../../commons/types/generated/types";
 import { Dispatch, SetStateAction, useState } from "react";
 
 export const usePathState = (): [

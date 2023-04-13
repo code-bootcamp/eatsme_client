@@ -53,14 +53,98 @@ export const markerState = atom({
 export const pickMarkerState = atom({
   key: "pickMarkerState",
   default: [] as any,
+  dangerouslyAllowMutability: true,
 });
 
 export const infoWindowState = atom({
   key: "infoWindowState",
   default: [] as any,
+  dangerouslyAllowMutability: true,
 });
 
 export const findLineState = atom({
   key: "findLineState",
   default: [] as any,
+});
+
+export const slideSettingState = atom({
+  key: "slideSettingState",
+  default: {
+    keyword: ["", "", "", "", "", ""],
+    nowPage: 0,
+    isActive: true,
+    disabled_next: true,
+    disabled_prev: true,
+  },
+});
+
+export const pathState = atom({
+  key: "pathState",
+  dangerouslyAllowMutability: true,
+  default: {
+    title: "",
+    boardImg: "",
+    startArea: "",
+    endArea: "",
+    startPoint: "",
+    endPoint: "",
+    like: 0,
+    info: [
+      {
+        restaurantName: "상호명",
+        recommend: "",
+        imgUrl: "",
+        section: "",
+        area: "",
+        location: {
+          lat: 0,
+          lng: 0,
+        },
+      },
+      {
+        restaurantName: "상호명",
+        recommend: "",
+        imgUrl: "",
+        section: "",
+        area: "",
+        location: {
+          lat: 0,
+          lng: 0,
+        },
+      },
+      {
+        restaurantName: "상호명",
+        recommend: "",
+        imgUrl: "",
+        section: "",
+        area: "",
+        location: {
+          lat: 0,
+          lng: 0,
+        },
+      },
+      {
+        restaurantName: "상호명",
+        recommend: "",
+        imgUrl: "",
+        section: "",
+        area: "",
+        location: {
+          lat: 0,
+          lng: 0,
+        },
+      },
+      {
+        restaurantName: "상호명",
+        recommend: "",
+        imgUrl: "",
+        section: "",
+        area: "",
+        location: {
+          lat: 0,
+          lng: 0,
+        },
+      },
+    ],
+  },
 });

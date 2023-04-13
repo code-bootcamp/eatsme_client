@@ -8,7 +8,15 @@ import {
   useState,
 } from "react";
 import { useRecoilState } from "recoil";
-import { mapState, markerState } from "../../../../../commons/stores";
+import {
+  findLineState,
+  infoWindowState,
+  mapState,
+  markerState,
+  pathState,
+  pickMarkerState,
+  slideSettingState,
+} from "../../../../../commons/stores";
 import {
   ICreateBoardInput,
   IQuery,
@@ -17,6 +25,8 @@ import { useChangeUploadFile } from "../../../../commons/hooks/custom/useChangeU
 import { useClickCreateBoard } from "../../../../commons/hooks/custom/useClickCreateBoard";
 import { useClickUpdateBoard } from "../../../../commons/hooks/custom/useClickUpdateBoard";
 import { useEffectTMapLoad } from "../../../../commons/hooks/custom/useEffectTMapLoad";
+import { useMapFindRoad } from "../../../../commons/hooks/custom/useMapFindRoad";
+import { useMapMarker } from "../../../../commons/hooks/custom/useMapMarker";
 import { useSetIsToggle } from "../../../../commons/hooks/custom/useSetIsToggle";
 import { mapFindRoad } from "../../../../commons/libraries/mapFindRoad";
 import { mapMarker } from "../../../../commons/libraries/mapMarker";
@@ -50,23 +60,36 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
   const imgRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<Record<string, string>>({});
   const [isToggle, changeIsToggle] = useSetIsToggle();
-  const [marker, setMarker] = useState<any[]>([]);
-  const [pickMarker, setPickMarker] = useState<any[]>([]);
-  const [infoWindow, setInfoWindow] = useState<any[]>([]);
-  const [findLine, setFindLine] = useState<any[]>([]);
   const { onChangeUploadFile } = useChangeUploadFile();
-  const [slideSetting, setSlideSetting] = useState<ISlideSetting>({
-    keyword: ["", "", "", "", "", ""],
-    nowPage: 0,
-    isActive: true,
-    disabled_next: true,
-    disabled_prev: true,
-  });
 
+  const [slideSetting, setSlideSetting] = useRecoilState(slideSettingState);
+  const [path, setPath] = useRecoilState(pathState);
+  const [marker, setMarker] = useRecoilState(markerState);
   const [map, setMap] = useRecoilState(mapState);
+  const [infoWindow, setInfoWindow] = useRecoilState(infoWindowState);
+  const [pickMarker] = useRecoilState(pickMarkerState);
   const { onClickSearch } = onClickMapSearch();
+  const { pickMapMarker } = useMapMarker();
+  const { axiosFindRoad } = useMapFindRoad();
 
   useEffectTMapLoad(setMap);
+
+  useEffect(() => {
+    // search 마커들중 다른 마커 클릭시 켜져있던 인포윈도우 제거
+    if (infoWindow.length > 1) {
+      infoWindow[0].setMap(null);
+      setInfoWindow([infoWindow[1]]);
+    }
+  }, [infoWindow]);
+
+  useEffect(() => {
+    if (path.info[0].restaurantName !== "상호명") {
+      pickMapMarker();
+      void axiosFindRoad();
+      setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
+    }
+  }, [path.info]);
+
   // useEffectTMapLoad({
   //   isSearch: false,
   //   isSet: props.isSet,
@@ -170,14 +193,14 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
     (pageNum: number) => (event: ChangeEvent<HTMLInputElement>) => {
       if (pageNum === 0) {
         // 코스 이름 작성
-        props.setPath((prev: ICreateBoardInput) => ({
+        setPath((prev) => ({
           ...prev,
           title: event.target.value,
         }));
         setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
       } else if (event.target.id === "recommend") {
         // 추천 메뉴 작성
-        props.setPath((prev: ICreateBoardInput) => ({
+        setPath((prev) => ({
           ...prev,
           info: prev.info.map((el, idx) => {
             if (pageNum - 1 === idx)
@@ -204,14 +227,15 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
     };
 
   const onClickNext = (): void => {
-    if (infoWindow.length > 0) {
-      infoWindow[0].setVisible(false);
-    }
+    // if (infoWindow.length > 0) {
+    //   infoWindow[0].setMap(null);
+    // }
     if (marker.length > 1) {
+      console.log("작동??");
       marker.map((el) => el.setMap(null));
     }
 
-    if (props.path?.info?.[slideSetting.nowPage].restaurantName === "상호명") {
+    if (path.info[slideSetting.nowPage].restaurantName === "상호명") {
       setSlideSetting((prev) => ({
         ...prev,
         disabled_next: true,
@@ -257,7 +281,7 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
         }));
         void onChangeUploadFile({
           file,
-          setPath: props.setPath,
+          setPath,
           nowPage: slideSetting.nowPage - 1,
         });
       }
@@ -287,7 +311,7 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
                 placeholder="코스 이름을 정해주세요."
                 onChange={onChangeInput(idx)}
                 maxLength={35}
-                value={props.path?.title ?? ""}
+                value={path?.title ?? ""}
               />
             </S.RouteBox>
           ) : (
@@ -316,14 +340,14 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
                   <S.Store
                     type="text"
                     readOnly
-                    value={props.path.info[idx - 1].restaurantName}
+                    value={path.info[idx - 1].restaurantName}
                   />
                   <S.Menu
                     id="recommend"
                     type="text"
                     placeholder="추천메뉴"
                     onChange={onChangeInput(idx)}
-                    value={props.path.info[idx - 1].recommend ?? ""}
+                    value={path.info[idx - 1].recommend ?? ""}
                   />
                 </S.StoreWrap>
               </S.SearchContainer>
@@ -361,9 +385,9 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
             <button
               onClick={() => {
                 if (props.isEdit) {
-                  void onClickUpdateBoard(props.path);
+                  void onClickUpdateBoard(path);
                 } else {
-                  void onClickCreateBoard(props.path);
+                  void onClickCreateBoard(path);
                 }
               }}
             >

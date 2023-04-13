@@ -1,7 +1,7 @@
 import { ISlideSetting } from "../../units/eatsMe/routeWrite/top/routeWriteTop";
 import { SetStateAction, Dispatch } from "react";
 import { ICreateBoardInput } from "../../../commons/types/generated/types";
-import { mapPopUp } from "./mapPopUp";
+import { mapPopUp } from "./useMapPopUp";
 declare const window: typeof globalThis & {
   Tmapv2: any;
 };
