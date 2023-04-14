@@ -35,22 +35,22 @@ export default function RouteDetail(props: IRouteDetailProps): JSX.Element {
     }
   };
 
-  // const onClickEdit = (event: MouseEvent<HTMLImageElement>): void => {
-  //   window.location.href = `/eatsMe/routeWrite/${event.currentTarget.id}`;
-  // };
+  const onClickEdit = (event: MouseEvent<HTMLImageElement>): void => {
+    window.location.href = `/eatsMe/routeWrite/${event.currentTarget.id}`;
+  };
   return (
     <S.Container>
       <S.TopWrapper
         id={String(props.idx)}
         onClick={props.onClickRoute?.(String(props.idx))}
       >
-        {/* {props.myBoard === true && (
+        {props.myBoard === true && (
           <S.ModifyImg
             src={"/modify.webp"}
             id={String(props.data.id)}
             onClick={onClickEdit}
           />
-        )} */}
+        )}
         <S.HeartImg
           src={
             likeData?.fetchMyLikeBoard.some((el) => el.id === props.data.id) ??
@@ -105,22 +105,16 @@ export default function RouteDetail(props: IRouteDetailProps): JSX.Element {
           <S.DivideLine></S.DivideLine>
           <S.BottomWrapper>
             <S.RestaurantBox>
-              <S.RestaurantCircle>
-                {props.data?.personalMapData?.map((_, idx) =>
-                  idx === 0 ? (
-                    <img src="/routeCircle_first.webp" key={idx} />
-                  ) : (
-                    <img src="/routeCircle_other.webp" key={idx} />
-                  )
-                )}
-              </S.RestaurantCircle>
-              <S.RestaurantName>
-                {props.data?.personalMapData?.map((el, idx) => (
-                  <div key={idx}>{`${el.restaurantName ?? ""} ${
-                    el.recommend !== "" ? "|" : ""
-                  } ${el.recommend ?? ""}`}</div>
-                ))}
-              </S.RestaurantName>
+              {props.data?.personalMapData?.map((el, idx) => (
+                <S.RestaurantName key={idx}>
+                  <S.ImgCircle src="/routeCircle_first.webp" />
+                  <div>
+                    {`${el.restaurantName ?? ""} ${
+                      el.recommend !== "" ? "|" : ""
+                    } ${el.recommend ?? ""}`}
+                  </div>
+                </S.RestaurantName>
+              ))}
             </S.RestaurantBox>
             <RouteDetailComment data={props.data} />
           </S.BottomWrapper>

@@ -1,29 +1,27 @@
+import { useRouter } from "next/router";
 import { useRecoilState } from "recoil";
-import { infoWindowState } from "../../../commons/stores";
-import { useClickInfoWindow } from "../hooks/custom/useClickInfoWindow";
+import { infoWindowState } from "../../../../commons/stores";
+import { useClickInfoWindow } from "./useClickInfoWindow";
 
 declare const window: typeof globalThis & {
   Tmapv2: any;
 };
 
 interface IUseMapPopUp {
-  onInfoWindow: (position: any, map: any, data: any, isSearch: boolean) => void;
+  onInfoWindow: (position: any, map: any, data: any, idx: number) => void;
 }
 
 export const useMapPopUp = (): IUseMapPopUp => {
-  const { onClickAdd } = useClickInfoWindow();
+  const { onClickAdd, onClickCancel } = useClickInfoWindow();
   const [, setInfoWindow] = useRecoilState(infoWindowState);
+  const router = useRouter();
 
   const onInfoWindow = (
     position: any,
     map: any,
     data: any,
-    isSearch: boolean
+    idx: number
   ): void => {
-    const onClickDelete = (): void => {
-      TInfoWindow.setVisible(false);
-    };
-
     const TInfoWindow = new window.Tmapv2.InfoWindow({
       position,
       align: 12,
@@ -36,11 +34,11 @@ export const useMapPopUp = (): IUseMapPopUp => {
           </div>
           <div>
             <div style='font-weight: 600; font-size: 12px; margin-bottom: 3px'>
-             ${isSearch ? data.name : data.restaurantName}
+              ${idx === -1 ? data.name : data.restaurantName}
             </div>
             <div style=' margin-top: 5px; margin-bottom: 20px; font-weight: 500; font-size: 10px; word-break: break-all'>
               ${
-                isSearch
+                idx === -1
                   ? data.newAddressList.newAddress[0].fullAddressRoad
                   : ""
               }
@@ -48,7 +46,13 @@ export const useMapPopUp = (): IUseMapPopUp => {
           </div>
         </div>
         <button class='Btn' style=' position: absolute; width: 45px; height: 20px; bottom: 6px; right: 6px; background: #fbb240; border-radius: 5px; border: none; font-weight: 500; font-size: 10px; color: #ffffff; cursor: pointer;' >
-          ${isSearch ? "추가" : "취소"}
+          ${
+            idx === -1
+              ? "추가"
+              : router.asPath === "/eatsMe/routeList/"
+              ? "예약"
+              : "취소"
+          }
         </button>
       </div>
       `,
@@ -59,18 +63,52 @@ export const useMapPopUp = (): IUseMapPopUp => {
     });
     setInfoWindow((prev: any) => [...prev, TInfoWindow]);
 
+    const onClickDelete = (): void => {
+      TInfoWindow.setVisible(false);
+    };
+
     const img = document.querySelectorAll("#deleteImg");
     img[0].addEventListener("click", onClickDelete);
     img[0].addEventListener("touchstart", onClickDelete);
 
     const btn = document.querySelectorAll(".Btn");
     btn[0].addEventListener("click", () => {
-      onClickAdd(data);
-      onClickDelete();
+      if (idx === -1) {
+        onClickAdd(data);
+        onClickDelete();
+      } else if (router.asPath === "/eatsMe/routeList/") {
+        localStorage.setItem(
+          "reserve",
+          JSON.stringify({
+            restaurantId: data.restaurantId,
+            restaurantName: data.restaurantName,
+            locationLat: data.location.lat,
+            locationLng: data.location.lng,
+          })
+        );
+        window.location.href = "/eatsMe/reserve";
+      } else {
+        onClickCancel(idx);
+      }
     });
     btn[0].addEventListener("touchstart", () => {
-      onClickAdd(data);
-      onClickDelete();
+      if (idx === -1) {
+        onClickAdd(data);
+        onClickDelete();
+      } else if (router.asPath === "/eatsMe/routeList/") {
+        localStorage.setItem(
+          "reserve",
+          JSON.stringify({
+            restaurantId: data.restaurantId,
+            restaurantName: data.restaurantName,
+            locationLat: data.location.lat,
+            locationLng: data.location.lng,
+          })
+        );
+        window.location.href = "/eatsMe/reserve";
+      } else {
+        onClickCancel(idx);
+      }
     });
 
     //     TInfoWindow.setVisible(false);

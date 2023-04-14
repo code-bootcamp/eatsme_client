@@ -1,9 +1,6 @@
 import styled from "@emotion/styled";
 const breakpoints = [576, 800, 1200];
 const mq = breakpoints.map((bp) => `@media (max-width: ${bp}px)`);
-// ${mq[0]} {
-//   font-size: 50px;
-// }
 
 export const Container = styled.div`
   margin-top: 40px;

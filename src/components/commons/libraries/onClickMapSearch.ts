@@ -12,7 +12,8 @@ interface IUseClickMapSearch {
 export const onClickMapSearch = (): IUseClickMapSearch => {
   const { searchMapMarker } = useMapMarker();
 
-  const onClickSearch = (keyword: string) => (): void => {
+  const onClickSearch = (keyword: string): void => {
+    if (keyword === "") return;
     const onComplete = (data: any): void => {
       const resultData = data._responseData.searchPoiInfo.pois.poi;
       const newData = [];

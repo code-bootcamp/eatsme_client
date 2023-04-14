@@ -7,7 +7,7 @@ import { useClickReserve } from "../../../../commons/hooks/custom/useClickReserv
 
 import { wrapAsync } from "../../../../commons/libraries/asyncFunc";
 import Head from "next/head";
-import { useEffectTmapLoadReserve } from "../../../../commons/hooks/custom/useEffectTmapLoadReserve";
+import { useEffectTMapLoad } from "../../../../commons/hooks/custom/useEffectTMapLoad";
 
 export interface IReserveFormData {
   table: number;
@@ -29,7 +29,7 @@ export default function ReserveMiddle(): JSX.Element {
   const [inputData, setInputData] = useState<any>({});
   const [map, setMap] = useState<any>({});
 
-  useEffectTmapLoadReserve({ setMap });
+  useEffectTMapLoad(setMap);
 
   useEffect(() => {
     setInputData(JSON.parse(String(localStorage.getItem("reserve"))));
@@ -44,7 +44,7 @@ export default function ReserveMiddle(): JSX.Element {
       if (position._lat !== 0) {
         const PTbounds = new window.Tmapv2.LatLngBounds();
         PTbounds.extend(position);
-        const TMarker = new window.Tmapv2.Marker({
+        void new window.Tmapv2.Marker({
           position,
           icon: "/marker_or.webp",
           iconSize: new window.Tmapv2.Size(40, 40),
@@ -52,7 +52,6 @@ export default function ReserveMiddle(): JSX.Element {
         });
         if (map !== undefined) {
           map.setCenter(position);
-          console.log(TMarker);
         }
       }
     }
@@ -71,7 +70,6 @@ export default function ReserveMiddle(): JSX.Element {
   return (
     <>
       <Head>
-        {/* <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=kzTmdjGzc91aQiicRAWjBCpCySY90Cs3AZJ7iVbd"></script> */}
         <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=fwJ1lVM3a0680zMo4QJLR1sByJarNOZ66mlgdoPf"></script>
       </Head>
       <form onSubmit={wrapAsync(handleSubmit(onClickReserve))}>

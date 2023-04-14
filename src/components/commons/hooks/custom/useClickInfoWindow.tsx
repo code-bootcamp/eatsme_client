@@ -1,13 +1,18 @@
 import { useRecoilState } from "recoil";
-import { pathState, slideSettingState } from "../../../../commons/stores";
+import {
+  infoWindowClickState,
+  pathState,
+  slideSettingState,
+} from "../../../../commons/stores";
 
 interface IUseClickInfoWindow {
-  onClickAdd: (props: IProps) => void;
-  onClickDelete: (props: IProps) => void;
+  onClickAdd: (data: any) => void;
+  onClickCancel: (idx: number) => void;
 }
 
-export const useClickInfoWindow = () => {
+export const useClickInfoWindow = (): IUseClickInfoWindow => {
   const [slideSetting, setSlideSetting] = useRecoilState(slideSettingState);
+  const [, setInfoWindowClick] = useRecoilState(infoWindowClickState);
   const [, setPath] = useRecoilState(pathState);
   const area: Record<string, string> = {
     서울: "서울시",
@@ -30,21 +35,21 @@ export const useClickInfoWindow = () => {
 
   const onClickAdd = (data: any): void => {
     if (slideSetting.nowPage === 1) {
-      setPath((prev) => ({
+      setPath((prev: any) => ({
         ...prev,
         startArea: area[data.upperAddrName],
         startPoint: data.middleAddrName.split(" ")[0],
       }));
     } else if (slideSetting.nowPage === 2) {
-      setPath((prev) => ({
+      setPath((prev: any) => ({
         ...prev,
         endArea: area[data.upperAddrName],
         endPoint: data.middleAddrName.split(" ")[0],
       }));
     }
-    setPath((prev) => ({
+    setPath((prev: any) => ({
       ...prev,
-      info: prev.info.map((el, idx) => {
+      info: prev.info.map((el: any, idx: number) => {
         if (idx === slideSetting.nowPage - 1)
           return {
             ...el,
@@ -59,20 +64,23 @@ export const useClickInfoWindow = () => {
         return { ...el };
       }),
     }));
+    setInfoWindowClick((prev) => prev + 1);
   };
 
-  const onClickDelete = (props: IProps): void => {
+  const onClickCancel = (idx: number): void => {
     const defaultInfo: any = {
       restaurantName: "상호명",
       recommend: "",
       imgUrl: "",
+      section: "",
+      area: "",
       location: {
         lat: 0,
         lng: 0,
       },
     };
 
-    props.setSlideSetting?.((prev) => {
+    setSlideSetting((prev) => {
       if (prev.nowPage !== 0) {
         return { ...prev, nowPage: prev.nowPage - 1 };
       } else {
@@ -80,13 +88,14 @@ export const useClickInfoWindow = () => {
       }
     });
 
-    props.setPath?.((prev) => {
+    setPath((prev: any) => {
       const info = [...prev.info];
-      info.splice(props.idx ?? 0, 1);
+      info.splice(idx, 1);
       info.push(defaultInfo);
       return { ...prev, info };
     });
+    setInfoWindowClick((prev) => prev + 1);
   };
 
-  return { onClickAdd, onClickDelete };
+  return { onClickAdd, onClickCancel };
 };

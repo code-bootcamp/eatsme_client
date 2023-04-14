@@ -1,26 +1,14 @@
 import { Modal } from "antd";
-import {
-  ChangeEvent,
-  Dispatch,
-  MouseEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import {
-  findLineState,
+  infoWindowClickState,
   infoWindowState,
   mapState,
   markerState,
   pathState,
-  pickMarkerState,
   slideSettingState,
 } from "../../../../../commons/stores";
-import {
-  ICreateBoardInput,
-  IQuery,
-} from "../../../../../commons/types/generated/types";
 import { useChangeUploadFile } from "../../../../commons/hooks/custom/useChangeUploadFile";
 import { useClickCreateBoard } from "../../../../commons/hooks/custom/useClickCreateBoard";
 import { useClickUpdateBoard } from "../../../../commons/hooks/custom/useClickUpdateBoard";
@@ -28,12 +16,7 @@ import { useEffectTMapLoad } from "../../../../commons/hooks/custom/useEffectTMa
 import { useMapFindRoad } from "../../../../commons/hooks/custom/useMapFindRoad";
 import { useMapMarker } from "../../../../commons/hooks/custom/useMapMarker";
 import { useSetIsToggle } from "../../../../commons/hooks/custom/useSetIsToggle";
-import { mapFindRoad } from "../../../../commons/libraries/mapFindRoad";
-import { mapMarker } from "../../../../commons/libraries/mapMarker";
-import {
-  mapSearch,
-  onClickMapSearch,
-} from "../../../../commons/libraries/onClickMapSearch";
+import { onClickMapSearch } from "../../../../commons/libraries/onClickMapSearch";
 import * as S from "./routeWriteTopStyles";
 
 export interface ISlideSetting {
@@ -45,13 +28,7 @@ export interface ISlideSetting {
 }
 
 export interface IRouteWriteTopProps {
-  setMap: Dispatch<any>;
-  map: any;
-  data: Pick<IQuery, "fetchBoard"> | undefined;
   isEdit: boolean;
-  path: any;
-  setPath: Dispatch<any>;
-  isSet: boolean;
 }
 
 export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
@@ -64,13 +41,13 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
 
   const [slideSetting, setSlideSetting] = useRecoilState(slideSettingState);
   const [path, setPath] = useRecoilState(pathState);
-  const [marker, setMarker] = useRecoilState(markerState);
-  const [map, setMap] = useRecoilState(mapState);
+  const [marker] = useRecoilState(markerState);
+  const [, setMap] = useRecoilState(mapState);
   const [infoWindow, setInfoWindow] = useRecoilState(infoWindowState);
-  const [pickMarker] = useRecoilState(pickMarkerState);
   const { onClickSearch } = onClickMapSearch();
   const { pickMapMarker } = useMapMarker();
   const { axiosFindRoad } = useMapFindRoad();
+  const [infoWindowClick] = useRecoilState(infoWindowClickState);
 
   useEffectTMapLoad(setMap);
 
@@ -83,126 +60,51 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
   }, [infoWindow]);
 
   useEffect(() => {
-    if (path.info[0].restaurantName !== "상호명") {
+    // infoWindow의 추가,취소 버튼 클릭시
+    // 켜져있던 infoWindow 닫기, 마커 다시 찍기, 변경된 값으로 길찾기 다시작성, 이전 및 다음 슬라이드 버튼 설정
+    if (infoWindowClick > 0) {
+      if (infoWindow.length !== 0) {
+        infoWindow[0].setVisible(false);
+      }
+      marker.map((el: any) => el.setMap(null));
       pickMapMarker();
       void axiosFindRoad();
-      setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
+
+      if (slideSetting.nowPage === 5) {
+        // 슬라이드가 코스 최대 작성 갯수인 5 페이지라면 다음 버튼 비활성화
+        setSlideSetting((prev) => ({ ...prev, disabled_next: true }));
+      } else {
+        setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
+      }
+
+      if (slideSetting.nowPage === 0) {
+        // 슬라이드가 제일 첫 페이지 라면 이전 버튼 비활성화
+        setSlideSetting((prev) => ({ ...prev, disabled_prev: true }));
+      }
+
+      if (path.info[1].restaurantName !== "상호명") {
+        // 최소 2개의 음식점이 작성됬다면 코스작성 버튼 활성화
+        setSlideSetting((prev) => ({ ...prev, isActive: false }));
+      } else {
+        setSlideSetting((prev) => ({ ...prev, isActive: true }));
+      }
     }
-  }, [path.info]);
-
-  // useEffectTMapLoad({
-  //   isSearch: false,
-  //   isSet: props.isSet,
-  //   data: props.path,
-  //   isWrite: true,
-  //   setMap: props.setMap,
-  //   marker: pickMarker,
-  //   setMarker: setPickMarker,
-  //   findLine,
-  //   setFindLine,
-  //   setInfoWindow,
-  //   setSlideSetting,
-  //   slideSetting,
-  //   map: props.map,
-  //   setPath: props.setPath,
-  // });
-
-  // useEffect(() => {
-  //   if (marker.length !== 0) {
-  //     marker.map((el) => el.setMap(null));
-  //     mapMarker({
-  //       data: props.path,
-  //       isSearch: false,
-  //       isWrite: true,
-  //       map: props.map,
-  //       setMap: props.setMap,
-  //       marker: pickMarker,
-  //       setMarker: setPickMarker,
-  //       setInfoWindow,
-  //       slideSetting,
-  //       setSlideSetting,
-  //       setPath: props.setPath,
-  //     });
-  //   } else if (marker.length === 0 && pickMarker.length !== 0) {
-  //     mapMarker({
-  //       data: props.path,
-  //       isSearch: false,
-  //       isWrite: true,
-  //       map: props.map,
-  //       setMap: props.setMap,
-  //       marker: pickMarker,
-  //       setMarker: setPickMarker,
-  //       setInfoWindow,
-  //       slideSetting,
-  //       setSlideSetting,
-  //       setPath: props.setPath,
-  //     });
-  //   }
-  //   if (props.path?.info?.[1].restaurantName !== "상호명") {
-  //     mapFindRoad({
-  //       data: props.path,
-  //       isWrite: true,
-  //       map: props.map,
-  //       findLine,
-  //       setFindLine,
-  //     });
-  //   } else {
-  //     findLine.map((el) => el.setMap(null));
-  //     setFindLine([]);
-  //   }
-
-  //   if (
-  //     slideSetting.nowPage !== 0 &&
-  //     props.path?.info?.[slideSetting.nowPage - 1].restaurantName !== "상호명"
-  //   ) {
-  //     if (slideSetting.nowPage + 1 < 6 && slideSetting.nowPage !== 0) {
-  //       setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
-  //     }
-  //     if (slideSetting.nowPage >= 2) {
-  //       setSlideSetting((prev) => ({ ...prev, isActive: false }));
-  //     }
-  //   } else if (slideSetting.nowPage === 0 && props.path.title !== "") {
-  //     if (props.isEdit && props.path?.info?.[1].restaurantName !== "상호명") {
-  //       setSlideSetting((prev) => ({
-  //         ...prev,
-  //         isActive: false,
-  //       }));
-  //     }
-  //     setSlideSetting((prev) => ({
-  //       ...prev,
-  //       disabled_next: false,
-  //       disabled_prev: true,
-  //     }));
-  //   } else {
-  //     setSlideSetting((prev) => ({
-  //       ...prev,
-  //       disabled_next: true,
-  //       isActive: true,
-  //     }));
-  //   }
-  // }, [props.path.info]);
-
-  // useEffect(() => {
-  //   if (infoWindow.length > 1) {
-  //     infoWindow[0].setMap(null);
-  //     setInfoWindow([infoWindow[1]]);
-  //   }
-  // }, [infoWindow]);
+  }, [infoWindowClick]);
 
   const onChangeInput =
     (pageNum: number) => (event: ChangeEvent<HTMLInputElement>) => {
       if (pageNum === 0) {
         // 코스 이름 작성
-        setPath((prev) => ({
+        setPath((prev: any) => ({
           ...prev,
           title: event.target.value,
         }));
         setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
       } else if (event.target.id === "recommend") {
         // 추천 메뉴 작성
-        setPath((prev) => ({
+        setPath((prev: any) => ({
           ...prev,
-          info: prev.info.map((el, idx) => {
+          info: prev.info.map((el: any, idx: number) => {
             if (pageNum - 1 === idx)
               return {
                 ...el,
@@ -227,12 +129,12 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
     };
 
   const onClickNext = (): void => {
-    // if (infoWindow.length > 0) {
-    //   infoWindow[0].setMap(null);
-    // }
+    // infoWindow 및 마커 지우기
+    if (infoWindow.length > 0) {
+      infoWindow[0].setVisible(false);
+    }
     if (marker.length > 1) {
-      console.log("작동??");
-      marker.map((el) => el.setMap(null));
+      marker.map((el: any) => el.setVisible(false));
     }
 
     if (path.info[slideSetting.nowPage].restaurantName === "상호명") {
@@ -249,6 +151,14 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
   };
 
   const onClickPrev = (): void => {
+    // infoWindow 및 마커 지우기
+    if (infoWindow.length > 0) {
+      infoWindow[0].setVisible(false);
+    }
+    if (marker.length > 1) {
+      marker.map((el: any) => el.setVisible(false));
+    }
+
     if (slideSetting.nowPage - 1 === 0) {
       setSlideSetting((prev) => ({
         ...prev,
@@ -333,7 +243,9 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
                     value={slideSetting.keyword[idx - 1]}
                   />
                   <button
-                    onClick={onClickSearch(slideSetting.keyword[idx - 1])}
+                    onClick={() => {
+                      onClickSearch(slideSetting.keyword[idx - 1]);
+                    }}
                   ></button>
                 </S.SearchWrap>
                 <S.StoreWrap>

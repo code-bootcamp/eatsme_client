@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useRecoilState } from "recoil";
 import { findLineState, mapState, pathState } from "../../../../commons/stores";
-import { useMapMarker } from "./useMapMarker";
 
 declare const window: typeof globalThis & {
   Tmapv2: any;
@@ -35,18 +34,19 @@ export const useMapFindRoad = (): IUseMapFindRoad => {
           strokeWeight: 4,
           map,
         });
+        setFindLine((prev: any) => [...prev, TLine]);
       }
     }
   };
 
   const axiosFindRoad = async (): Promise<void> => {
-    // 출발 및 도착이 작성 되어 있을시에만 길찾기 작동
-    if (path?.info?.[1].restaurantName === "상호명") return;
     if (findLine.length !== 0) {
       // 이전 길찾기 내역이 있을경우 해당 Line을 제거
       findLine.map((el: any) => el.setMap(null));
       setFindLine([]);
     }
+    // 출발 및 도착이 작성 되어 있을시에만 길찾기 작동
+    if (path?.info?.[1].restaurantName === "상호명") return;
 
     const dataPos: any = {};
     for (let i = 0; i < path.info.length; i++) {
@@ -60,9 +60,10 @@ export const useMapFindRoad = (): IUseMapFindRoad => {
         dataPos.end = path.info[i].location;
       } else {
         if (dataPos.stopOver === undefined) {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           dataPos.stopOver = `${path.info[i].location.lng},${path.info[i].location.lat}`;
         } else {
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/restrict-template-expressions
           dataPos.stopOver += `_${path.info[i].location.lng},${path.info[i].location.lat}`;
         }
       }

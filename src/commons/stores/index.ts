@@ -38,6 +38,12 @@ export const boardIdState = atom({
   default: "",
 });
 
+export const infoWindowClickState = atom({
+  key: "infoWindowClickState",
+  default: 0,
+  dangerouslyAllowMutability: true,
+});
+
 export const mapState = atom({
   key: "mapState",
   default: {} as any,
@@ -65,10 +71,12 @@ export const infoWindowState = atom({
 export const findLineState = atom({
   key: "findLineState",
   default: [] as any,
+  dangerouslyAllowMutability: true,
 });
 
 export const slideSettingState = atom({
   key: "slideSettingState",
+  dangerouslyAllowMutability: true,
   default: {
     keyword: ["", "", "", "", "", ""],
     nowPage: 0,
@@ -146,5 +154,5 @@ export const pathState = atom({
         },
       },
     ],
-  },
+  } as any,
 });

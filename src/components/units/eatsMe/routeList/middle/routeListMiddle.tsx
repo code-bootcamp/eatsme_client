@@ -1,110 +1,83 @@
 import Head from "next/head";
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect } from "react";
 import { useRecoilState } from "recoil";
-import { fetchBoardsByEveryInputState } from "../../../../../commons/stores";
-import { useClickRouteList } from "../../../../commons/hooks/custom/useClickRouteList";
+import {
+  infoWindowClickState,
+  infoWindowState,
+  mapState,
+  markerState,
+  pathState,
+} from "../../../../../commons/stores";
+import { IQuery } from "../../../../../commons/types/generated/types";
 import { useEffectTMapLoad } from "../../../../commons/hooks/custom/useEffectTMapLoad";
+import { useFetchDataSet } from "../../../../commons/hooks/custom/useFetchDataSet";
+import { useMapFindRoad } from "../../../../commons/hooks/custom/useMapFindRoad";
+import { useMapMarker } from "../../../../commons/hooks/custom/useMapMarker";
 import { useSetIsActive } from "../../../../commons/hooks/custom/useSetIsActive";
-import { useSetIsToggle } from "../../../../commons/hooks/custom/useSetIsToggle";
-import { mapFindRoad } from "../../../../commons/libraries/mapFindRoad";
-import { mapMarker } from "../../../../commons/libraries/mapMarker";
 import RouteDetail from "../../../../commons/routeDetail/routeDetail";
-import LocationSelector from "../../../../locationSelector/locationSelector";
-import SubLocationSelector from "../../../../subLocationSelector/subLocationSelector";
 import * as S from "./routeListMiddleStyles";
 
-export default function RouteListMiddle(): JSX.Element {
-  const [map, setMap] = useState<any>({});
-  const [marker, setMarker] = useState<any[]>([]);
-  const [findLine, setFindLine] = useState<any[]>([]);
-  const [infoWindow, setInfoWindow] = useState<any[]>([]);
+interface IRouteListMiddleProps {
+  data: Pick<IQuery, "fetchBoardsByEvery"> | undefined;
+}
+
+export default function RouteListMiddle(
+  props: IRouteListMiddleProps
+): JSX.Element {
   const [isActive, onClickIsActive] = useSetIsActive();
-  const [isStart, changeIsStart] = useSetIsToggle();
-  const [isEnd, changeIsEnd] = useSetIsToggle();
-  const [startPoint, setStartPoint] = useState("");
-  const [endPoint, setEndPoint] = useState("");
-  const [startArea, setStartArea] = useState("서울시");
-  const [endArea, setEndArea] = useState("");
-  const [isStartToggle, changeIsStartToggle] = useSetIsToggle();
-  const [isEndToggle, changeIsEndToggle] = useSetIsToggle();
-  const [, setFetchBoardsByEveryInput] = useRecoilState(
-    fetchBoardsByEveryInputState
-  );
-  const [reserve, setReserve] = useState("");
-  const [isLoad, setIsLoad] = useState(false);
+  const [, setMap] = useRecoilState(mapState);
+  const [, setPath] = useRecoilState(pathState);
+  const [marker] = useRecoilState(markerState);
+  const [infoWindow, setInfoWindow] = useRecoilState(infoWindowState);
+  const [infoWindowClick, setInfoWindowClick] =
+    useRecoilState(infoWindowClickState);
 
-  const { data, refetch } = useClickRouteList({
-    fetchBoardsByEveryInput: {
-      startArea,
-    },
-  });
-  console.log(data, "epdldaldledl");
+  const { pickMapMarker } = useMapMarker();
+  const { axiosFindRoad } = useMapFindRoad();
+  const { fetchDataSet } = useFetchDataSet();
+
+  useEffectTMapLoad(setMap);
 
   useEffect(() => {
-    if (reserve !== "") {
-      localStorage.setItem("reserve", JSON.stringify(reserve));
-      window.location.href = "/eatsMe/reserve";
-    }
-  }, [reserve]);
-
-  useEffect(() => {
-    if (Object.keys(map).length !== 0) {
-      const obj = { startPoint, endPoint, startArea, endArea };
-      const fetchBoardsByEveryInput = Object.fromEntries(
-        Object.entries(obj).filter(([_, value]) => value !== "")
-      );
-      setFetchBoardsByEveryInput(fetchBoardsByEveryInput);
-      void refetch({ fetchBoardsByEveryInput });
-    }
-  }, [startPoint, endPoint, startArea, endArea]);
-
-  useEffectTMapLoad({
-    data: data?.fetchBoardsByEvery[0],
-    map,
-    setMap,
-    marker,
-    setMarker,
-    findLine,
-    setFindLine,
-    setInfoWindow,
-    isWrite: false,
-    isSearch: false,
-    setReserve,
-  });
-
-  useEffect(() => {
+    // search 마커들중 다른 마커 클릭시 켜져있던 인포윈도우 제거
     if (infoWindow.length > 1) {
       infoWindow[0].setMap(null);
       setInfoWindow([infoWindow[1]]);
     }
   }, [infoWindow]);
 
+  useEffect(() => {
+    if (
+      props.data !== undefined &&
+      props.data.fetchBoardsByEvery.length !== 0
+    ) {
+      fetchDataSet({
+        setPath,
+        setInfoWindowClick,
+        data: props.data?.fetchBoardsByEvery[0],
+      });
+    }
+  }, [props.data]);
+
+  useEffect(() => {
+    if (infoWindowClick > 0) {
+      if (infoWindow.length !== 0) {
+        infoWindow[0].setVisible(false);
+      }
+      marker.map((el: any) => el.setMap(null));
+      pickMapMarker();
+      void axiosFindRoad();
+    }
+  }, [infoWindowClick]);
+
   const onClickRoute =
     (idx: string) =>
     (event: MouseEvent<HTMLDivElement>): void => {
-      if (infoWindow[0] !== undefined) {
-        infoWindow[0].setVisible(false);
-      }
-      mapMarker({
-        data: data?.fetchBoardsByEvery[Number(idx)],
-        map,
-        marker,
-        setMarker,
-        setInfoWindow,
-        isWrite: false,
-        isSearch: false,
-        setReserve,
+      fetchDataSet({
+        setPath,
+        setInfoWindowClick,
+        data: props.data?.fetchBoardsByEvery[Number(idx)],
       });
-
-      mapFindRoad({
-        data: data?.fetchBoardsByEvery[Number(idx)],
-        map,
-        findLine,
-        setFindLine,
-        isWrite: false,
-        setReserve,
-      });
-
       onClickIsActive(event);
     };
 
@@ -114,90 +87,10 @@ export default function RouteListMiddle(): JSX.Element {
         <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=fwJ1lVM3a0680zMo4QJLR1sByJarNOZ66mlgdoPf"></script>
       </Head>
       <S.Container>
-        <S.SelectWrapper>
-          <S.BoxWrapper className="start">
-            <S.CityWrapper>
-              <S.City
-                onClick={() => {
-                  changeIsStartToggle();
-                }}
-              >
-                <div>{startArea === "" ? "출발지역" : startArea}</div>
-                <S.Arrow isStartToggle={isStartToggle} />
-              </S.City>
-              <S.SelectorWrapper isToggle={isStartToggle}>
-                <LocationSelector
-                  setLocation={setStartArea}
-                  changeIsToggle={changeIsStartToggle}
-                />
-              </S.SelectorWrapper>
-            </S.CityWrapper>
-
-            <S.DistrictWrapper>
-              <S.District
-                onClick={() => {
-                  changeIsStart();
-                }}
-              >
-                <div>{startPoint === "" ? "출발지" : startPoint}</div>
-                <S.Arrow isStart={isStart} />
-              </S.District>
-              <S.SelectorWrapper isToggle={isStart}>
-                <SubLocationSelector
-                  isLoad={isLoad}
-                  isList={true}
-                  setIsLoad={setIsLoad}
-                  location={startArea}
-                  changeIsToggle={changeIsStart}
-                  setSubLocation={setStartPoint}
-                />
-              </S.SelectorWrapper>
-            </S.DistrictWrapper>
-          </S.BoxWrapper>
-
-          <S.ArrowImg src="/arrow_or.webp" />
-
-          <S.BoxWrapper className="end">
-            <S.CityWrapper>
-              <S.City
-                onClick={() => {
-                  changeIsEndToggle();
-                }}
-              >
-                <div>{endArea === "" ? "도착지역" : endArea}</div>
-                <S.Arrow isEndToggle={isEndToggle} />
-              </S.City>
-              <S.SelectorWrapper isToggle={isEndToggle}>
-                <LocationSelector
-                  setLocation={setEndArea}
-                  changeIsToggle={changeIsEndToggle}
-                />
-              </S.SelectorWrapper>
-            </S.CityWrapper>
-
-            <S.DistrictWrapper>
-              <S.District
-                onClick={() => {
-                  changeIsEnd();
-                }}
-              >
-                <div>{endPoint === "" ? "도착지" : endPoint}</div>
-                <S.Arrow isEnd={isEnd} />
-              </S.District>
-              <S.SelectorWrapper isToggle={isEnd}>
-                <SubLocationSelector
-                  location={endArea}
-                  changeIsToggle={changeIsEnd}
-                  setSubLocation={setEndPoint}
-                />
-              </S.SelectorWrapper>
-            </S.DistrictWrapper>
-          </S.BoxWrapper>
-        </S.SelectWrapper>
         <S.Contents>
           <S.ListWrapper>
             <S.ItemWrapper>
-              {data?.fetchBoardsByEvery.map((el, idx) => (
+              {props.data?.fetchBoardsByEvery.map((el, idx) => (
                 <RouteDetail
                   data={el}
                   key={idx}
