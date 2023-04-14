@@ -1,5 +1,4 @@
 import {
-  FieldValues,
   FormState,
   UseFormGetValues,
   UseFormHandleSubmit,
@@ -13,11 +12,27 @@ import { useTimer } from "../hooks/custom/useTimer";
 import * as S from "./joinEmailStyles";
 
 interface IJoinEmail {
-  formState2: FormState<FieldValues>;
-  register2: UseFormRegister<FieldValues>;
-  handleSubmit2: UseFormHandleSubmit<FieldValues>;
-  getValues2: UseFormGetValues<FieldValues>;
-  setValue2: UseFormSetValue<FieldValues>;
+  formState2: FormState<{
+    email: string;
+    authNumber: string;
+  }>;
+  register2: UseFormRegister<{
+    email: string;
+    authNumber: string;
+  }>;
+  getValues2: UseFormGetValues<{
+    email: string;
+    authNumber: string;
+  }>;
+  setValue2: UseFormSetValue<{
+    email: string;
+    authNumber: string;
+  }>;
+  handleSubmit2: UseFormHandleSubmit<{
+    email: string;
+    authNumber: string;
+  }>;
+
   formState3: FormState<{
     email: string;
   }>;

@@ -34,7 +34,7 @@ export default function JoinMiddle(): JSX.Element {
     handleSubmit: handleSubmit2,
     getValues: getValues2,
     setValue: setValue2,
-  } = useForm({
+  } = useForm<{ email: string; authNumber: string }>({
     resolver: yupResolver(schema2),
     mode: "onChange",
   });
@@ -77,13 +77,13 @@ export default function JoinMiddle(): JSX.Element {
         <JoinEmail
           formState2={formState2}
           register2={register2}
-          handleSubmit2={handleSubmit2}
           getValues2={getValues2}
+          setValue2={setValue2}
+          handleSubmit2={handleSubmit2}
           formState3={formState3}
           register3={register3}
           handleSubmit3={handleSubmit3}
           getValues3={getValues3}
-          setValue2={setValue2}
         />
         <S.PwdForm onSubmit={wrapAsync(handleSubmit1(onClickSubmit))}>
           <S.PasswordBox>

@@ -5,7 +5,9 @@ interface IUseClickMatchAuth {
   onClickMatchAuth: (data: IMatchAuthNumberInput) => Promise<void>;
 }
 
-export const useClickMatchAuth = (setTime): IUseClickMatchAuth => {
+export const useClickMatchAuth = (
+  setTime: React.Dispatch<React.SetStateAction<number>>
+): IUseClickMatchAuth => {
   const [matchAuth] = useMutationMatchAuthNumber();
 
   const onClickMatchAuth = async (
