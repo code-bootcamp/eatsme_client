@@ -1,24 +1,22 @@
 import { Modal } from "antd";
+import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react";
+import { useRecoilState } from "recoil";
 import {
-  ChangeEvent,
-  Dispatch,
-  MouseEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import {
-  ICreateBoardInput,
-  IQuery,
-} from "../../../../../commons/types/generated/types";
+  infoWindowClickState,
+  infoWindowState,
+  mapState,
+  markerState,
+  pathState,
+  slideSettingState,
+} from "../../../../../commons/stores";
 import { useChangeUploadFile } from "../../../../commons/hooks/custom/useChangeUploadFile";
 import { useClickCreateBoard } from "../../../../commons/hooks/custom/useClickCreateBoard";
 import { useClickUpdateBoard } from "../../../../commons/hooks/custom/useClickUpdateBoard";
 import { useEffectTMapLoad } from "../../../../commons/hooks/custom/useEffectTMapLoad";
+import { useMapFindRoad } from "../../../../commons/hooks/custom/useMapFindRoad";
+import { useMapMarker } from "../../../../commons/hooks/custom/useMapMarker";
 import { useSetIsToggle } from "../../../../commons/hooks/custom/useSetIsToggle";
-import { mapFindRoad } from "../../../../commons/libraries/mapFindRoad";
-import { mapMarker } from "../../../../commons/libraries/mapMarker";
-import { mapSearch } from "../../../../commons/libraries/mapSearch";
+import { onClickMapSearch } from "../../../../commons/libraries/onClickMapSearch";
 import * as S from "./routeWriteTopStyles";
 
 export interface ISlideSetting {
@@ -30,13 +28,7 @@ export interface ISlideSetting {
 }
 
 export interface IRouteWriteTopProps {
-  setMap: Dispatch<any>;
-  map: any;
-  data: Pick<IQuery, "fetchBoard"> | undefined;
   isEdit: boolean;
-  path: any;
-  setPath: Dispatch<any>;
-  isSet: boolean;
 }
 
 export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
@@ -45,130 +37,74 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
   const imgRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<Record<string, string>>({});
   const [isToggle, changeIsToggle] = useSetIsToggle();
-  const [marker, setMarker] = useState<any[]>([]);
-  const [pickMarker, setPickMarker] = useState<any[]>([]);
-  const [infoWindow, setInfoWindow] = useState<any[]>([]);
-  const [findLine, setFindLine] = useState<any[]>([]);
   const { onChangeUploadFile } = useChangeUploadFile();
-  const [slideSetting, setSlideSetting] = useState<ISlideSetting>({
-    keyword: ["", "", "", "", "", ""],
-    nowPage: 0,
-    isActive: true,
-    disabled_next: true,
-    disabled_prev: true,
-  });
 
-  useEffectTMapLoad({
-    isSearch: false,
-    isSet: props.isSet,
-    data: props.path,
-    isWrite: true,
-    setMap: props.setMap,
-    marker: pickMarker,
-    setMarker: setPickMarker,
-    findLine,
-    setFindLine,
-    setInfoWindow,
-    setSlideSetting,
-    slideSetting,
-    map: props.map,
-    setPath: props.setPath,
-  });
+  const [slideSetting, setSlideSetting] = useRecoilState(slideSettingState);
+  const [path, setPath] = useRecoilState(pathState);
+  const [marker] = useRecoilState(markerState);
+  const [, setMap] = useRecoilState(mapState);
+  const [infoWindow, setInfoWindow] = useRecoilState(infoWindowState);
+  const { onClickSearch } = onClickMapSearch();
+  const { pickMapMarker } = useMapMarker();
+  const { axiosFindRoad } = useMapFindRoad();
+  const [infoWindowClick] = useRecoilState(infoWindowClickState);
+
+  useEffectTMapLoad(setMap);
 
   useEffect(() => {
-    if (marker.length !== 0) {
-      marker.map((el) => el.setMap(null));
-      mapMarker({
-        data: props.path,
-        isSearch: false,
-        isWrite: true,
-        map: props.map,
-        setMap: props.setMap,
-        marker: pickMarker,
-        setMarker: setPickMarker,
-        setInfoWindow,
-        slideSetting,
-        setSlideSetting,
-        setPath: props.setPath,
-      });
-    } else if (marker.length === 0 && pickMarker.length !== 0) {
-      mapMarker({
-        data: props.path,
-        isSearch: false,
-        isWrite: true,
-        map: props.map,
-        setMap: props.setMap,
-        marker: pickMarker,
-        setMarker: setPickMarker,
-        setInfoWindow,
-        slideSetting,
-        setSlideSetting,
-        setPath: props.setPath,
-      });
-    }
-    if (props.path?.info?.[1].restaurantName !== "상호명") {
-      mapFindRoad({
-        data: props.path,
-        isWrite: true,
-        map: props.map,
-        findLine,
-        setFindLine,
-      });
-    } else {
-      findLine.map((el) => el.setMap(null));
-      setFindLine([]);
-    }
-
-    if (
-      slideSetting.nowPage !== 0 &&
-      props.path?.info?.[slideSetting.nowPage - 1].restaurantName !== "상호명"
-    ) {
-      if (slideSetting.nowPage + 1 < 6 && slideSetting.nowPage !== 0) {
-        setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
-      }
-      if (slideSetting.nowPage >= 2) {
-        setSlideSetting((prev) => ({ ...prev, isActive: false }));
-      }
-    } else if (slideSetting.nowPage === 0 && props.path.title !== "") {
-      if (props.isEdit && props.path?.info?.[1].restaurantName !== "상호명") {
-        setSlideSetting((prev) => ({
-          ...prev,
-          isActive: false,
-        }));
-      }
-      setSlideSetting((prev) => ({
-        ...prev,
-        disabled_next: false,
-        disabled_prev: true,
-      }));
-    } else {
-      setSlideSetting((prev) => ({
-        ...prev,
-        disabled_next: true,
-        isActive: true,
-      }));
-    }
-  }, [props.path.info]);
-
-  useEffect(() => {
+    // search 마커들중 다른 마커 클릭시 켜져있던 인포윈도우 제거
     if (infoWindow.length > 1) {
       infoWindow[0].setMap(null);
       setInfoWindow([infoWindow[1]]);
     }
   }, [infoWindow]);
 
+  useEffect(() => {
+    // infoWindow의 추가,취소 버튼 클릭시
+    // 켜져있던 infoWindow 닫기, 마커 다시 찍기, 변경된 값으로 길찾기 다시작성, 이전 및 다음 슬라이드 버튼 설정
+    if (infoWindowClick > 0) {
+      if (infoWindow.length !== 0) {
+        infoWindow[0].setVisible(false);
+      }
+      marker.map((el: any) => el.setMap(null));
+      pickMapMarker();
+      void axiosFindRoad();
+
+      if (slideSetting.nowPage === 5) {
+        // 슬라이드가 코스 최대 작성 갯수인 5 페이지라면 다음 버튼 비활성화
+        setSlideSetting((prev) => ({ ...prev, disabled_next: true }));
+      } else {
+        setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
+      }
+
+      if (slideSetting.nowPage === 0) {
+        // 슬라이드가 제일 첫 페이지 라면 이전 버튼 비활성화
+        setSlideSetting((prev) => ({ ...prev, disabled_prev: true }));
+      }
+
+      if (path.info[1].restaurantName !== "상호명") {
+        // 최소 2개의 음식점이 작성됬다면 코스작성 버튼 활성화
+        setSlideSetting((prev) => ({ ...prev, isActive: false }));
+      } else {
+        setSlideSetting((prev) => ({ ...prev, isActive: true }));
+      }
+    }
+  }, [infoWindowClick]);
+
   const onChangeInput =
     (pageNum: number) => (event: ChangeEvent<HTMLInputElement>) => {
       if (pageNum === 0) {
-        props.setPath((prev: ICreateBoardInput) => ({
+        // 코스 이름 작성
+        setPath((prev: any) => ({
           ...prev,
           title: event.target.value,
         }));
         setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
       } else if (event.target.id === "recommend") {
-        props.setPath((prev: ICreateBoardInput) => ({
+        // 추천 메뉴 작성
+        setPath((prev: any) => ({
           ...prev,
-          info: prev.info.map((el, idx) => {
+          info: prev.info.map((el: any, idx: number) => {
             if (pageNum - 1 === idx)
               return {
                 ...el,
@@ -178,6 +114,7 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
           }),
         }));
       } else {
+        // 검색 키워드 작성
         setSlideSetting((prev) => ({
           ...prev,
           keyword: prev.keyword.map((el, idx) => {
@@ -192,14 +129,15 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
     };
 
   const onClickNext = (): void => {
+    // infoWindow 및 마커 지우기
     if (infoWindow.length > 0) {
       infoWindow[0].setVisible(false);
     }
     if (marker.length > 1) {
-      marker.map((el) => el.setMap(null));
+      marker.map((el: any) => el.setVisible(false));
     }
 
-    if (props.path?.info?.[slideSetting.nowPage].restaurantName === "상호명") {
+    if (path.info[slideSetting.nowPage].restaurantName === "상호명") {
       setSlideSetting((prev) => ({
         ...prev,
         disabled_next: true,
@@ -213,6 +151,14 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
   };
 
   const onClickPrev = (): void => {
+    // infoWindow 및 마커 지우기
+    if (infoWindow.length > 0) {
+      infoWindow[0].setVisible(false);
+    }
+    if (marker.length > 1) {
+      marker.map((el: any) => el.setVisible(false));
+    }
+
     if (slideSetting.nowPage - 1 === 0) {
       setSlideSetting((prev) => ({
         ...prev,
@@ -245,7 +191,7 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
         }));
         void onChangeUploadFile({
           file,
-          setPath: props.setPath,
+          setPath,
           nowPage: slideSetting.nowPage - 1,
         });
       }
@@ -275,7 +221,7 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
                 placeholder="코스 이름을 정해주세요."
                 onChange={onChangeInput(idx)}
                 maxLength={35}
-                value={props.path?.title ?? ""}
+                value={path?.title ?? ""}
               />
             </S.RouteBox>
           ) : (
@@ -297,36 +243,23 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
                     value={slideSetting.keyword[idx - 1]}
                   />
                   <button
-                    onClick={mapSearch({
-                      map: props.map,
-                      setMap: props.setMap,
-                      keyword: slideSetting.keyword[idx - 1],
-                      idx: idx - 1,
-                      path: props.path ?? "",
-                      setPath: props.setPath,
-                      marker,
-                      setMarker,
-                      infoWindow,
-                      setInfoWindow,
-                      isSearch: true,
-                      setSlideSetting,
-                      // 에러떠서 속성추가
-                      slideSetting: undefined,
-                    })}
+                    onClick={() => {
+                      onClickSearch(slideSetting.keyword[idx - 1]);
+                    }}
                   ></button>
                 </S.SearchWrap>
                 <S.StoreWrap>
                   <S.Store
                     type="text"
                     readOnly
-                    value={props.path.info[idx - 1].restaurantName}
+                    value={path.info[idx - 1].restaurantName}
                   />
                   <S.Menu
                     id="recommend"
                     type="text"
                     placeholder="추천메뉴"
                     onChange={onChangeInput(idx)}
-                    value={props.path.info[idx - 1].recommend ?? ""}
+                    value={path.info[idx - 1].recommend ?? ""}
                   />
                 </S.StoreWrap>
               </S.SearchContainer>
@@ -364,9 +297,9 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
             <button
               onClick={() => {
                 if (props.isEdit) {
-                  void onClickUpdateBoard(props.path);
+                  void onClickUpdateBoard(path);
                 } else {
-                  void onClickCreateBoard(props.path);
+                  void onClickCreateBoard(path);
                 }
               }}
             >

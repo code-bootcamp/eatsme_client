@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useState } from "react";
-import { useEffectTmapLoadPopular } from "../../../../commons/hooks/custom/useEffectTmapLoadPopular";
+import { useEffectTMapLoad } from "../../../../commons/hooks/custom/useEffectTMapLoad";
 import * as S from "./popularListMiddleStyles";
 
 declare const window: typeof globalThis & {
@@ -10,7 +10,7 @@ declare const window: typeof globalThis & {
 export default function PopularListMiddle(props: any): JSX.Element {
   const [map, setMap] = useState<any>({});
   const [marker, setMarker] = useState<any>(null);
-  useEffectTmapLoadPopular({ setMap });
+  useEffectTMapLoad(setMap);
 
   const onClickStore = (event: any): any => {
     if (marker !== null) {

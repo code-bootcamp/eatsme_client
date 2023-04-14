@@ -141,33 +141,24 @@ export const BottomWrapper = styled.div`
 `;
 
 export const RestaurantBox = styled.div`
-  display: flex;
-  flex-direction: row;
   width: 40%;
 `;
 
-export const RestaurantCircle = styled.div`
-  padding: 2px 0;
-  display: flex;
-  flex-direction: column;
-
-  & > img {
-    width: 12px;
-    height: 42px;
-  }
-
-  & > img:first-of-type {
-    width: 12px;
-    height: 12px;
-  }
-`;
-
 export const RestaurantName = styled.div`
-  margin-left: 10px;
+  display: flex;
+  flex-direction: row;
+
   & > div {
     margin-bottom: 25px;
     font-weight: 500;
     font-size: 14px;
     line-height: 17px;
   }
+`;
+
+export const ImgCircle = styled.img`
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  margin-top: 2px;
 `;
