@@ -54,7 +54,7 @@ export default function UserInfo(): JSX.Element {
               <S.ImgWrap onClick={onClickImg}>
                 <S.UserImg
                   src={
-                    fetchLoginUser.userImg === ""
+                    fetchLoginUser.userImg === null
                       ? imgUrl
                       : `https://storage.googleapis.com/${String(
                           fetchLoginUser.userImg
