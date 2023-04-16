@@ -40,7 +40,6 @@ export const CityWrapper = styled.div`
 export const City = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: center;
   align-items: center;
   width: 150px;
   height: 60px;

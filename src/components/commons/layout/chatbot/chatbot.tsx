@@ -1,3 +1,4 @@
+import axios from "axios";
 import { MouseEvent, useEffect, useRef, useState } from "react";
 import * as S from "./chatbotStyles";
 
@@ -14,6 +15,38 @@ interface IMessage {
 export default function Chatbot(props: IChatbot): JSX.Element {
   const [answer, setAnswer] = useState<IMessage[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [inputValue, setInputValue] = useState<string>("");
+
+  const handleSubmit = async (): Promise<void> => {
+    setInputValue("");
+    const newAnswer: IMessage[] = [
+      ...answer,
+      { speaker: "user", message: inputValue },
+    ];
+    setAnswer(newAnswer);
+    setAnswer([
+      ...newAnswer,
+      { speaker: "chatbot", message: "잠시만 기다려주세요..." },
+    ]);
+    try {
+      const result = await axios({
+        method: "POST",
+        url: "https://jjjbackendclass.shop/info/channel",
+        data: {
+          question: inputValue,
+        },
+      });
+
+      const botAnswer = result.data;
+      const finalAnswer: IMessage[] = [
+        ...newAnswer,
+        { speaker: "chatbot", message: botAnswer },
+      ];
+      setAnswer(finalAnswer);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     if (chatEndRef.current != null) {
@@ -100,8 +133,19 @@ export default function Chatbot(props: IChatbot): JSX.Element {
       </S.Content>
 
       <S.ChatInput>
-        <input type="text" />
-        <img src="/chat.webp" />
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+          }}
+        />
+
+        <button
+          onClick={() => {
+            void handleSubmit();
+          }}
+        ></button>
       </S.ChatInput>
     </S.Container>
   );

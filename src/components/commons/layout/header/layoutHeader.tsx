@@ -1,7 +1,10 @@
 import { useClickLogout } from "../../hooks/custom/useClickLogout";
 import { useRouterMovePage } from "../../hooks/custom/useRouterMovePage";
 import { useRecoilState } from "recoil";
-import { accessTokenState } from "../../../../commons/stores";
+import {
+  accessTokenState,
+  fetchLoginUserState,
+} from "../../../../commons/stores";
 import * as S from "./layoutHeaderStyles";
 import { wrapAsync } from "../../libraries/asyncFunc";
 import { useQuery } from "@apollo/client";
@@ -9,6 +12,7 @@ import { FETCH_LOGIN_USER } from "../../hooks/query/useQueryFetchLoginUser";
 import { IQuery } from "../../../../commons/types/generated/types";
 // import Alarm from "../../alarm/alarm";
 import { useSetIsToggle } from "../../hooks/custom/useSetIsToggle";
+import { useEffect } from "react";
 
 export interface IHeader {
   hiddenCss: boolean;
@@ -18,8 +22,15 @@ export default function LayoutHeader(props: IHeader): JSX.Element {
   const { onClickMovePage } = useRouterMovePage();
   const [accessToken] = useRecoilState(accessTokenState);
   const { data } = useQuery<Pick<IQuery, "fetchLoginUser">>(FETCH_LOGIN_USER);
+  const [, setFetchLoginUser] = useRecoilState(fetchLoginUserState);
   const { onClickLogout } = useClickLogout();
   const [, changeIsToggle] = useSetIsToggle();
+
+  useEffect(() => {
+    if (data?.fetchLoginUser !== undefined) {
+      setFetchLoginUser(data.fetchLoginUser);
+    }
+  }, [data]);
 
   return (
     <S.Container hiddenCss={props.hiddenCss}>

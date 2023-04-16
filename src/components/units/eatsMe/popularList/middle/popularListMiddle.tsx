@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useState } from "react";
-import { useEffectTmapLoadPopular } from "../../../../commons/hooks/custom/useEffectTmapLoadPopular";
+import { useEffectTMapLoad } from "../../../../commons/hooks/custom/useEffectTMapLoad";
 import * as S from "./popularListMiddleStyles";
 
 declare const window: typeof globalThis & {
@@ -10,11 +10,9 @@ declare const window: typeof globalThis & {
 export default function PopularListMiddle(props: any): JSX.Element {
   const [map, setMap] = useState<any>({});
   const [marker, setMarker] = useState<any>(null);
-  useEffectTmapLoadPopular({ setMap });
+  useEffectTMapLoad(setMap);
 
   const onClickStore = (event: any): any => {
-    console.log(event.target.id, "enfenenvenn");
-
     if (marker !== null) {
       marker.setMap(null);
     }
@@ -35,23 +33,23 @@ export default function PopularListMiddle(props: any): JSX.Element {
       setMarker(TMarker);
     }
   };
-
   return (
     <>
       <Head>
-        {/* <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=kzTmdjGzc91aQiicRAWjBCpCySY90Cs3AZJ7iVbd"></script> */}
-        <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=IaSnfI55gi9P9QUeMvkq58fRd5VsGBs85RX1zGaV"></script>
+        <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=fwJ1lVM3a0680zMo4QJLR1sByJarNOZ66mlgdoPf"></script>
       </Head>
       <S.Container>
         <S.ListWrapper>
           {props.location?.data.map((el: any, idx: any) => (
             <S.StoreBox
-              key={idx}
+              key={Number(idx) + 1}
               onClick={onClickStore}
               id={`${String(el.location.lat)},${String(el.location.lng)}`}
             >
               <S.StoreCont>
-                <S.FoodImg src="/defaultfood.webp" />
+                <S.FoodImg
+                  src={el.image !== null ? el.image : "/defaultFood.webp"}
+                />
                 <div>
                   <S.RatingBox>
                     <S.StoreName>
@@ -63,42 +61,14 @@ export default function PopularListMiddle(props: any): JSX.Element {
                   <S.TimeWrapper>
                     <span>
                       {
-                        el.openingDays?.filter((el: any) =>
+                        el.openingDays?.filter((el: string) =>
                           el.includes("휴무일")
                         )[0]
                       }
                     </span>
                     <S.TimeInfoBox>
-                      <div>
-                        Open
-                        {
-                          // el.openingDays
-                          //   .filter((day) => !day.includes("휴무일"))
-                          //   .map((day) => day.split(": ")[1].split(" ~ "))[
-                          //   Math.floor(
-                          //     Math.random() *
-                          //       el.openingDays.filter(
-                          //         (day) => !day.includes("휴무일")
-                          //       ).length
-                          //   )
-                          // ][0]
-                        }
-                      </div>
-                      <div>
-                        Close
-                        {
-                          // el.openingDays
-                          //   .filter((day) => !day.includes("휴무일"))
-                          //   .map((day) => day.split(": ")[1].split(" ~ "))[
-                          //   Math.floor(
-                          //     Math.random() *
-                          //       el.openingDays.filter(
-                          //         (day) => !day.includes("휴무일")
-                          //       ).length
-                          //   )
-                          // ][1]
-                        }
-                      </div>
+                      {/* <div>Open {}</div>
+                      <div> Close{ } </div> */}
                     </S.TimeInfoBox>
                   </S.TimeWrapper>
                 </div>

@@ -1,4 +1,6 @@
 import { MouseEvent } from "react";
+import { useRecoilState } from "recoil";
+import { fetchBoardsByEveryInputState } from "../../../../commons/stores";
 import { useMutationDeleteReply } from "../mutation/useMutationDeleteReply";
 import { FETCH_BOARD_BY_EVERY } from "../query/useQueryFetchBoardsByEvery";
 
@@ -8,6 +10,9 @@ interface IUseClickDeleteReply {
 
 export const useClickDeleteReply = (): IUseClickDeleteReply => {
   const [deleteReply] = useMutationDeleteReply();
+  const [fetchBoardsByEveryInput] = useRecoilState(
+    fetchBoardsByEveryInputState
+  );
 
   const onClickDeleteReply = async (
     event: MouseEvent<HTMLImageElement>
@@ -18,6 +23,7 @@ export const useClickDeleteReply = (): IUseClickDeleteReply => {
         refetchQueries: [
           {
             query: FETCH_BOARD_BY_EVERY,
+            variables: { fetchBoardsByEveryInput },
           },
         ],
       });

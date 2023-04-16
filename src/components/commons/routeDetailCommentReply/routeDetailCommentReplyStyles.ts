@@ -19,7 +19,14 @@ export const ImgWrapper = styled.div`
   }
 `;
 
-export const ReplyWrapper = styled.form`
+export const ReplyWriteWrapper = styled.form`
+  position: relative;
+  width: 100%;
+  padding: 6px;
+  background-color: white;
+`;
+
+export const ReplyWrapper = styled.div`
   position: relative;
   width: 100%;
   padding: 6px;
@@ -77,6 +84,7 @@ export const ReplySubmit = styled.button`
   color: white;
   font-weight: 500;
   font-size: 12px;
+  cursor: pointer;
 `;
 
 export const ReplyTextarea = styled.textarea`
@@ -121,4 +129,5 @@ export const ReplyModifySubmit = styled.button`
   color: white;
   font-weight: 500;
   font-size: 12px;
+  cursor: pointer;
 `;

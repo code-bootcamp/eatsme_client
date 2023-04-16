@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 
-export const useTimer = (): any => {
+interface ITimer {
+  time: number;
+  setTime: React.Dispatch<React.SetStateAction<number>>;
+  setIsStarted: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const useTimer = (): ITimer => {
   const [time, setTime] = useState(30);
   const [isStarted, setIsStarted] = useState(false);
 
   useEffect(() => {
-    let timer: any;
+    let timer: NodeJS.Timeout | undefined;
 
     if (isStarted) {
       timer = setInterval(() => {
@@ -13,13 +19,15 @@ export const useTimer = (): any => {
       }, 1000);
     }
 
-    if (time <= 0) {
+    if (time <= 0 && timer != null) {
       clearInterval(timer);
       setIsStarted(false);
     }
 
     return () => {
-      clearInterval(timer);
+      if (timer != null) {
+        clearInterval(timer);
+      }
     };
   }, [isStarted, time]);
 

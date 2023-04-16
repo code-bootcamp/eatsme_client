@@ -1,16 +1,20 @@
 import { gql, useMutation } from "@apollo/client";
+import {
+  IMutation,
+  IMutationMatchAuthNumberArgs,
+} from "../../../../commons/types/generated/types";
 
 const MATCH_AUTH = gql`
-  mutation matchAuthNumber($matchtAuthNumberInput: MatchAuthNumberInput!) {
-    matchAuthNumber(matchtAuthNumberInput: $matchtAuthNumberInput) {
-      email
-      authNumber
-    }
+  mutation matchAuthNumber($matchAuthNumberInput: MatchAuthNumberInput!) {
+    matchAuthNumber(matchAuthNumberInput: $matchAuthNumberInput)
   }
 `;
 
-export const useMutationMatchAuthNumber = (): any => {
-  const matchAuth = useMutation(MATCH_AUTH);
+export const useMutationMatchAuthNumber = (): typeof matchAuth => {
+  const matchAuth = useMutation<
+    Pick<IMutation, "matchAuthNumber">,
+    IMutationMatchAuthNumberArgs
+  >(MATCH_AUTH);
 
   return matchAuth;
 };

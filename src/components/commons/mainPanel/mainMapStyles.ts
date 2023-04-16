@@ -42,6 +42,10 @@ export const Container = styled.div`
       top: 40%;
       width: 300px;
     }
+    ${mq[0]} {
+      top: 50%;
+      width: 300px;
+    }
   }
 `;
 

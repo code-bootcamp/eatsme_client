@@ -217,29 +217,35 @@ export const UserBox = styled.div`
   width: 216px;
 `;
 
-export const UserImg = styled.img`
+export const ImgWrap = styled.div`
+  position: relative;
   width: 168px;
   height: 168px;
+
+  ::after {
+    position: absolute;
+    right: 15px;
+    bottom: 0;
+    content: "";
+    width: 30px;
+    height: 30px;
+    background: url(/imgSelect.webp) no-repeat;
+    background-size: contain;
+  }
+  input {
+    display: none;
+  }
+`;
+export const UserImg = styled.img`
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 50%;
   object-fit: contain;
   cursor: pointer;
   /* 미디어 쿼리 800px */
   ${mq[1]} {
     width: 100px;
     height: 100px;
-  }
-`;
-
-export const SelectImg = styled.img`
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  /* 미디어 쿼리 800px */
-  ${mq[1]} {
-    width: 18px;
-    height: 18px;
-    right: 5px;
-    bottom: 15px;
   }
 `;

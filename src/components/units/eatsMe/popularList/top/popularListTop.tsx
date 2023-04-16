@@ -1,29 +1,51 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSetIsToggle } from "../../../../commons/hooks/custom/useSetIsToggle";
-import SubLocationSelector from "../../../../subLocationSelector/subLocationSelector";
+import SubLocationSelector from "../../../../commons/subLocationSelector/subLocationSelector";
 import * as S from "./popularListTopStyles";
+import LocationSelector from "../../../../commons/locationSelector/locationSelector";
 
 export default function PopularListTop(props: any): JSX.Element {
+  const [startArea, setStartArea] = useState("");
+  const [startPoint, setStartPoint] = useState("");
+  const [isStartToggle, changeIsStartToggle] = useSetIsToggle();
   const [isStart, changeIsStart] = useSetIsToggle();
-  const [startPoint, setStartPoint] = useState("강남구");
 
-  const onClickLocation = async (): Promise<void> => {
-    const result = await axios.get(
-      `https://jjjbackendclass.shop/info/road/restaurant?area=서울시&section=${startPoint}`
-      // "https://jjjbackendclass.shop/info/road/restaurant?area=서울시&section=강남구"
-    );
-    console.log("버튼콘솔", result);
-    props.setLocation(result);
-  };
+  useEffect(() => {
+    const location = localStorage.getItem("startArea");
+    setStartArea(location !== null ? location : "서울시");
+  }, []);
+
+  useEffect(() => {
+    if (startArea !== "" && startPoint !== "") {
+      const showList = async (): Promise<void> => {
+        const result = await axios.get(
+          `https://jjjbackendclass.shop/info/road/restaurant?area=${startArea}&section=${startPoint}`
+        );
+        props.setLocation(result);
+      };
+      void showList();
+    }
+  }, [startArea, startPoint]);
 
   return (
     <S.Container>
       <S.Wrapper>
         <S.CityWrapper>
-          <S.City>
-            <div>서울시</div>
+          <S.City
+            onClick={() => {
+              changeIsStartToggle();
+            }}
+          >
+            <div>{startArea === "" ? "출발지역" : startArea}</div>
+            <S.Arrow isStartToggle={isStartToggle} />
           </S.City>
+          <S.SelectorWrapper isToggle={isStartToggle}>
+            <LocationSelector
+              setLocation={setStartArea}
+              changeIsToggle={changeIsStartToggle}
+            />
+          </S.SelectorWrapper>
         </S.CityWrapper>
 
         <S.DistrictWrapper>
@@ -32,17 +54,19 @@ export default function PopularListTop(props: any): JSX.Element {
               changeIsStart();
             }}
           >
-            <div>{startPoint === "" ? "지역" : startPoint}</div>
+            <div>{startPoint === "" ? "출발지" : startPoint}</div>
             <S.Arrow isStart={isStart} />
           </S.District>
           <S.SelectorWrapper isToggle={isStart}>
             <SubLocationSelector
+              isList={false}
+              subLocation={startPoint}
+              location={startArea}
               changeIsToggle={changeIsStart}
               setSubLocation={setStartPoint}
             />
           </S.SelectorWrapper>
         </S.DistrictWrapper>
-        <S.LocationBtn onClick={onClickLocation}>맛집 검색</S.LocationBtn>
       </S.Wrapper>
     </S.Container>
   );

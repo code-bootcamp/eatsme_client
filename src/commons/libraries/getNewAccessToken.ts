@@ -9,10 +9,9 @@ const RESTORE_ACCESS_TOKEN = gql`
 
 export const getNewAccessToken = async (): Promise<string | undefined> => {
   try {
-    const graphQLClient = new GraphQLClient(
-      "https://jjjbackendclass.shop/graphql",
-      { credentials: "include" }
-    );
+    const graphQLClient = new GraphQLClient("https://sit-woo.store/graphql", {
+      credentials: "include",
+    });
 
     const result = await graphQLClient.request<
       Pick<IMutation, "restoreAccessToken">

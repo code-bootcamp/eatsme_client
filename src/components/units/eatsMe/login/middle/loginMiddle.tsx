@@ -1,10 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
-import {
-  ILoginFormData,
-  useClickLogin,
-} from "../../../../commons/hooks/custom/useClickLogin";
+import { useClickLogin } from "../../../../commons/hooks/custom/useClickLogin";
 import { useRouterMovePage } from "../../../../commons/hooks/custom/useRouterMovePage";
 import { wrapAsync } from "../../../../commons/libraries/asyncFunc";
 import * as S from "./loginMiddleStyles";
@@ -14,23 +11,22 @@ export default function LoginMiddle(): JSX.Element {
   const router = useRouter();
   const { onClickMovePage } = useRouterMovePage();
   const { onClickLogin } = useClickLogin();
-  const { register, handleSubmit, formState } = useForm<ILoginFormData>({
+  const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
 
-  const onClickKakao = (): any => {
-    void router.push("https://eatsme.site");
+  const onClickKakao = (): void => {
+    void router.push("https://jjjbackendclass.shop/graphql/login/kakao");
   };
 
-  const onClickGoogle = (): any => {
-    void router.push("");
+  const onClickGoogle = (): void => {
+    void router.push("https://jjjbackendclass.shop/graphql/login/google");
   };
 
   return (
     <S.Container>
       <S.Wrapper>
-        {/* test */}
         <form onSubmit={wrapAsync(handleSubmit(onClickLogin))}>
           <S.Title>
             <h1>로그인</h1>

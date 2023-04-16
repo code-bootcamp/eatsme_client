@@ -10,14 +10,13 @@ import { schema3 } from "../../../../commons/joinEmail/joinEmailValidation3";
 
 export interface IJoinFormData {
   email: string;
-  token: string;
+  authNumber: string;
   nickname: string;
   password: string;
   passwordCheck: string;
 }
 
 export default function JoinMiddle(): JSX.Element {
-  // const { onClickNickname } = useClickIsValidNickname();
   const { onClickJoin } = useClickJoin();
   const {
     formState: formState1,
@@ -34,7 +33,8 @@ export default function JoinMiddle(): JSX.Element {
     register: register2,
     handleSubmit: handleSubmit2,
     getValues: getValues2,
-  } = useForm({
+    setValue: setValue2,
+  } = useForm<{ email: string; authNumber: string }>({
     resolver: yupResolver(schema2),
     mode: "onChange",
   });
@@ -43,7 +43,7 @@ export default function JoinMiddle(): JSX.Element {
     register: register3,
     handleSubmit: handleSubmit3,
     getValues: getValues3,
-  } = useForm({
+  } = useForm<{ email: string }>({
     resolver: yupResolver(schema3),
     mode: "onChange",
   });
@@ -56,9 +56,10 @@ export default function JoinMiddle(): JSX.Element {
     const isValid1 = schema1.isValidSync(data1);
     const isValid2 = schema2.isValidSync(data2);
     const isValid3 = schema2.isValidSync(data3);
+    console.log(isValid3);
 
-    if (isValid1 && isValid2 && isValid3) {
-      const data = { ...data1, ...data2, ...data3 };
+    if (isValid1 && isValid2) {
+      const data = { ...data1, ...data2 };
 
       void onClickJoin(data);
     }
@@ -76,8 +77,9 @@ export default function JoinMiddle(): JSX.Element {
         <JoinEmail
           formState2={formState2}
           register2={register2}
-          handleSubmit2={handleSubmit2}
           getValues2={getValues2}
+          setValue2={setValue2}
+          handleSubmit2={handleSubmit2}
           formState3={formState3}
           register3={register3}
           handleSubmit3={handleSubmit3}

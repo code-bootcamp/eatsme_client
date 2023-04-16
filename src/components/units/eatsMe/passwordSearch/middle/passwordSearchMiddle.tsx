@@ -5,8 +5,9 @@ import { schema } from "./passwordSearchMiddleValidation";
 import { useState } from "react";
 import { wrapAsync } from "../../../../commons/libraries/asyncFunc";
 import { useClickCheckEmail } from "../../../../commons/hooks/custom/useClickCheckEmail";
-
+import { useRouterMovePage } from "../../../../commons/hooks/custom/useRouterMovePage";
 export default function PasswordSearchMiddle(): JSX.Element {
+  const { routerMovePage } = useRouterMovePage();
   const { register, formState, handleSubmit } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
@@ -25,11 +26,11 @@ export default function PasswordSearchMiddle(): JSX.Element {
     setTimeout(() => {
       setOpen(false);
       setConfirmLoading(false);
+      routerMovePage("/eatsMe/login");
     }, 2000);
   };
 
   const handleCancel = (): void => {
-    console.log("Clicked cancel button");
     setOpen(false);
   };
   const onClickSearch = async (data: any): Promise<void> => {

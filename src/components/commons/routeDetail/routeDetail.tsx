@@ -1,46 +1,94 @@
+import { useQuery } from "@apollo/client";
 import { MouseEvent } from "react";
+import { useRecoilState } from "recoil";
+import { accessTokenState } from "../../../commons/stores";
+
+import { IBoardReturn, IQuery } from "../../../commons/types/generated/types";
+import { useClickToggleLike } from "../hooks/custom/useClickToggleLike";
+import { useCreateAtTime } from "../hooks/custom/useCreateAtTime";
+import { FETCH_MY_LIKE_BOARD } from "../hooks/query/useQueryFetchMyLikeBoard";
 import RouteDetailComment from "../routeDetailComment/routeDetailComment";
 import * as S from "./routeDetailStyles";
 
 interface IRouteDetailProps {
+  myBoard?: boolean;
+  data: IBoardReturn;
   idx: number;
   isActive: string;
-  onClickRoute: (event: MouseEvent<HTMLDivElement>) => void;
+  onClickRoute?: any;
   onClickIsActive: (event: MouseEvent<Element, globalThis.MouseEvent>) => void;
 }
 
 export default function RouteDetail(props: IRouteDetailProps): JSX.Element {
-  const menu = [
-    "싱싱해요포차 | 모듬 조개찜",
-    "싱싱해요포차 | 모듬 조개찜",
-    "싱싱해요포차 | 모듬 조개찜",
-    "싱싱해요포차 | 모듬 조개찜",
-  ];
+  const { lastCreateTime } = useCreateAtTime();
+  const { onClickToggleLike } = useClickToggleLike();
+  const { data: likeData } =
+    useQuery<Pick<IQuery, "fetchMyLikeBoard">>(FETCH_MY_LIKE_BOARD);
+  const [accessToken] = useRecoilState(accessTokenState);
+  const onClickLike = (event: MouseEvent<HTMLImageElement>): void => {
+    if (accessToken === "") {
+      return;
+    }
+    event.stopPropagation();
+    if (props.data.id !== undefined && props.data.id !== null) {
+      void onClickToggleLike(props.data?.id);
+    }
+  };
+
+  const onClickEdit = (event: MouseEvent<HTMLImageElement>): void => {
+    window.location.href = `/eatsMe/routeWrite/${event.currentTarget.id}`;
+  };
   return (
     <S.Container>
-      <S.TopWrapper id={String(props.idx)} onClick={props.onClickRoute}>
-        <S.HeartImg src="/heart_empty.webp" />
+      <S.TopWrapper
+        id={String(props.idx)}
+        onClick={props.onClickRoute?.(String(props.idx))}
+      >
+        {props.myBoard === true && (
+          <S.ModifyImg
+            src={"/modify.webp"}
+            id={String(props.data.id)}
+            onClick={onClickEdit}
+          />
+        )}
+        <S.HeartImg
+          src={
+            likeData?.fetchMyLikeBoard.some((el) => el.id === props.data.id) ??
+            false
+              ? "/heart_fill.webp"
+              : "/heart_empty.webp"
+          }
+          onClick={onClickLike}
+        />
         <S.UserInfoWBox>
           <S.UserImg>
-            <img src="/userImg_small.webp" />
+            <img
+              src={
+                props.data?.user?.userImg !== null
+                  ? `https://storage.googleapis.com/${String(
+                      props.data?.user?.userImg
+                    )}`
+                  : "/userImg_small.webp"
+              }
+            />
           </S.UserImg>
-          <div>나는문어나는문어</div>
+          <div>{props.data.user?.nickname}</div>
         </S.UserInfoWBox>
         <S.TitleBox>
-          <S.RouteTitle>강남 주변 맛집 코스 추천!!!!!가가</S.RouteTitle>
-          <S.CreateAt>12일전</S.CreateAt>
+          <S.RouteTitle>{props.data.title}</S.RouteTitle>
+          <S.CreateAt>{lastCreateTime(props.data.createdAt)}</S.CreateAt>
         </S.TitleBox>
         <S.LocationBox>
           <S.StartEndLocation>
             <div>출발</div>
-            <div>서울특별시</div>
+            <div>{props.data.startArea}</div>
           </S.StartEndLocation>
           <S.ListArrowImg>
             <img src="/arrow_or.webp" />
           </S.ListArrowImg>
           <S.StartEndLocation>
             <div>도착</div>
-            <div>제주도</div>
+            <div>{props.data.endArea}</div>
           </S.StartEndLocation>
         </S.LocationBox>
       </S.TopWrapper>
@@ -57,22 +105,18 @@ export default function RouteDetail(props: IRouteDetailProps): JSX.Element {
           <S.DivideLine></S.DivideLine>
           <S.BottomWrapper>
             <S.RestaurantBox>
-              <S.RestaurantCircle>
-                {menu.map((_, idx) =>
-                  idx === 0 ? (
-                    <img src="/routeCircle_first.webp" key={idx} />
-                  ) : (
-                    <img src="/routeCircle_other.webp" key={idx} />
-                  )
-                )}
-              </S.RestaurantCircle>
-              <S.RestaurantName>
-                {menu.map((el, idx) => (
-                  <div key={idx}>{el}</div>
-                ))}
-              </S.RestaurantName>
+              {props.data?.personalMapData?.map((el, idx) => (
+                <S.RestaurantName key={idx}>
+                  <S.ImgCircle src="/routeCircle_first.webp" />
+                  <div>
+                    {`${el.restaurantName ?? ""} ${
+                      el.recommend !== "" ? "|" : ""
+                    } ${el.recommend ?? ""}`}
+                  </div>
+                </S.RestaurantName>
+              ))}
             </S.RestaurantBox>
-            <RouteDetailComment />
+            <RouteDetailComment data={props.data} />
           </S.BottomWrapper>
         </>
       ) : (

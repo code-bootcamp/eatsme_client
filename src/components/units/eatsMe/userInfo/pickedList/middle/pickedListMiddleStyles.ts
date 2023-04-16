@@ -14,6 +14,7 @@ export const Container = styled.div`
   ${mq[2]} {
     gap: 0;
     height: auto;
+    padding: 0 25px;
   }
 `;
 

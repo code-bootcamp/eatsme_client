@@ -1,6 +1,9 @@
-import { MouseEvent, useRef } from "react";
+import { ChangeEvent, MouseEvent, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useRecoilState } from "recoil";
+import { accessTokenState, fetchLoginUserState } from "../../../commons/stores";
 import {
+  IBoardReturn,
   ICreateCommentInput,
   IUpdateCommentInput,
 } from "../../../commons/types/generated/types";
@@ -8,38 +11,44 @@ import { useClickCreateComment } from "../hooks/custom/useClickCreateComment";
 import { useClickDeleteComment } from "../hooks/custom/useClickDeleteComment";
 import { useClickUpdateComment } from "../hooks/custom/useClickUpdateComment";
 import { useSetIsActive } from "../hooks/custom/useSetIsActive";
-import { useSetIsToggle } from "../hooks/custom/useSetIsToggle";
 import { wrapFormAsync } from "../libraries/asyncFunc";
 import RouteDetailCommentReply from "../routeDetailCommentReply/routeDetailCommentReply";
 import * as S from "./routeDetailCommentStyles";
 
-export default function RouteDetailComment(): JSX.Element {
+interface IRouteDetailCommentProps {
+  data: IBoardReturn;
+}
+
+export default function RouteDetailComment(
+  props: IRouteDetailCommentProps
+): JSX.Element {
   const { register, handleSubmit } = useForm<ICreateCommentInput>();
   const {
-    register: register2,
     handleSubmit: handleSubmit2,
     setValue: setValue2,
+    register: register2,
   } = useForm<IUpdateCommentInput>();
   const [isReply, changeIsReply, setIsReply] = useSetIsActive();
   const [isCommentModify, changeIsCommentModify, setIsCommentModify] =
-    useSetIsToggle();
+    useSetIsActive();
+  const [isReplyModify, changeIsReplyModify, setIsReplyModify] =
+    useSetIsActive();
   const { onClickCreateComment } = useClickCreateComment();
   const { onClickUpdateComment } = useClickUpdateComment();
   const { onClickDeleteComment } = useClickDeleteComment();
+  const [fetchLoginUser] = useRecoilState(fetchLoginUserState);
   const CommentModifyRef = useRef<HTMLTextAreaElement>(null);
-  const comments = [
-    "댓글내용구아아아아아가라아아ㅏ아아가암내에ㅏㄴ매ㅔ앙아ㅣㅏㄱ람ㄴ암나아아아앙ㅁ나앤마안아암ㄴ",
-    "댓글내용구아아아아아가라아아ㅏ아아가암내에ㅏㄴ매ㅔ앙아ㅣㅏㄱ람ㄴ암나아아아앙ㅁ나앤마안아암ㄴ",
-    "댓글내용구아아아아아가라아아ㅏ아아가암내에ㅏㄴ매ㅔ앙아ㅣㅏㄱ람ㄴ암나아아아앙ㅁ나앤마안아암ㄴ",
-  ];
+  const [accessToken] = useRecoilState(accessTokenState);
 
-  const onChangeCommentModify = (): void => {
+  const onChangeCommentModify = (
+    event: ChangeEvent<HTMLTextAreaElement>
+  ): void => {
     if (CommentModifyRef.current !== null) {
       CommentModifyRef.current.style.height = `${
         CommentModifyRef.current?.scrollHeight ?? 0
       }px`;
     }
-    // 현재 제일 마지막 댓글만 작동되는중 아마도 여러개라서 그런듯 실제 데이터 넣고 실험해볼것
+    setValue2("comment", event.currentTarget.value);
   };
 
   const onClickCommentModifyIcon =
@@ -49,25 +58,35 @@ export default function RouteDetailComment(): JSX.Element {
       setIsReply("");
       setValue2("boardId", boardId);
       setValue2("commentId", event.currentTarget.id);
-      changeIsCommentModify();
+      changeIsCommentModify(event);
+      setIsReplyModify("");
     };
 
   const onClickComment = (event: MouseEvent<HTMLDivElement>): void => {
-    // 여기에 현재 접속한 유저 정보가 있을때(아이디) 작동하게 처리
-    if (!isCommentModify) {
+    if (isCommentModify === "" && fetchLoginUser.id !== undefined) {
       changeIsReply(event);
+      setIsReplyModify("");
     }
   };
 
-  // 전체적으로 입력된 값을이 ""이면 모달창
-  // ImgBox를 현재 접속한 유저 아이디와 댓글작성 유저 아이디와 같으면 보이게 처리 이렇게 하면 해당 유저가 아니면 안보이디 따로 분기처리 필요없음
-  // ImgBox안 img의 id는 댓글아이디
-  // 현재 전체적으로 refetchQueries에서 variables를 생략하고 있는데 이게 정상적으로 동작 하는지 체크
+  const onClickCommentSubmit = (data: { comment: string }): void => {
+    if (accessToken === "") {
+      return;
+    }
+
+    if (data.comment === undefined || data.comment === "") {
+      return;
+    }
+    void onClickCreateComment({
+      comment: data.comment,
+      boardId: props.data.id ?? "",
+    });
+  };
 
   return (
     <S.Container>
       <S.WriteWrapper
-        onSubmit={wrapFormAsync(handleSubmit(onClickCreateComment))}
+        onSubmit={wrapFormAsync(handleSubmit(onClickCommentSubmit))}
       >
         <input
           type="text"
@@ -77,47 +96,64 @@ export default function RouteDetailComment(): JSX.Element {
         <button>등록</button>
       </S.WriteWrapper>
       <S.DivideLine></S.DivideLine>
-      {comments.map((el, idx) => (
-        <S.CommentContainer key={idx}>
-          <S.CommentsWrapper id={String(idx)} onClick={onClickComment}>
-            <S.ImgBox>
-              <img
-                src="/modify.webp"
-                id={String(idx)}
-                onClick={onClickCommentModifyIcon("게시글아이디")}
-              />
-              <img
-                src="/delete.webp"
-                id={"댓글아이디"}
-                onClick={() => {
-                  void onClickDeleteComment;
-                }}
-              />
-            </S.ImgBox>
+      {props.data?.comments?.map((el) => (
+        <S.CommentContainer key={el.id}>
+          <S.CommentsWrapper id={el.id} onClick={onClickComment}>
+            {fetchLoginUser.id === el.user?.id ? (
+              <S.ImgBox>
+                <img
+                  src="/modify.webp"
+                  id={el.id ?? ""}
+                  onClick={onClickCommentModifyIcon(props.data.id ?? "")}
+                />
+                <img
+                  src="/delete.webp"
+                  id={el.id}
+                  onClick={onClickDeleteComment}
+                />
+              </S.ImgBox>
+            ) : (
+              <></>
+            )}
             <S.UserInfoBox>
-              <img src="/userImg_small.webp" />
-              <div>나는문어나는문어</div>
+              <img
+                src={
+                  el.user?.userImg !== null
+                    ? `https://storage.googleapis.com/${String(
+                        el.user?.userImg
+                      )}`
+                    : "/userImg_small.webp"
+                }
+              />
+              <div>{el.user?.nickname}</div>
             </S.UserInfoBox>
-            {isCommentModify ? (
+            {isCommentModify === el.id ? (
               <S.CommentsModifyBox
                 onSubmit={wrapFormAsync(
                   handleSubmit2(onClickUpdateComment(setIsCommentModify))
                 )}
               >
                 <S.CommentsModifyTextarea
-                  {...register2("comment", { onChange: onChangeCommentModify })}
+                  defaultValue={el.comment}
+                  {...register2("comment")}
+                  onChange={onChangeCommentModify}
                   ref={CommentModifyRef}
                 />
                 <S.CommentsModifySubmit>수정</S.CommentsModifySubmit>
               </S.CommentsModifyBox>
             ) : (
-              <S.Comments>{el}</S.Comments>
+              <S.Comments>{el.comment}</S.Comments>
             )}
           </S.CommentsWrapper>
           <RouteDetailCommentReply
-            id={String(idx)}
+            data={el.replies}
+            id={el.id}
             isReply={isReply}
             setIsReply={setIsReply}
+            isReplyModify={isReplyModify}
+            changeIsReplyModify={changeIsReplyModify}
+            setIsReplyModify={setIsReplyModify}
+            setIsCommentModify={setIsCommentModify}
           />
         </S.CommentContainer>
       ))}

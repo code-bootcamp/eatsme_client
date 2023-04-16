@@ -8,6 +8,7 @@ const CREATE_REPLY = gql`
   mutation ($createReplyInput: CreateReplyInput!) {
     createReply(createReplyInput: $createReplyInput) {
       id
+      reply
     }
   }
 `;

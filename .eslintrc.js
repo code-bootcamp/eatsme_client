@@ -12,6 +12,7 @@ module.exports = {
   },
   plugins: ["react"],
   rules: {
+    "@typescript-eslint/restrict-template-expressions": "off",
     "react/react-in-jsx-scope": "off",
     "@typescript-eslint/consistent-type-imports": "off",
     "@typescript-eslint/naming-convention": "off",

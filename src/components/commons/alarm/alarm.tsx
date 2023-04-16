@@ -13,7 +13,9 @@ export default function Alarm(props: IAlarmToggle): JSX.Element {
       <S.AlarmList>
         {props.data.alarms.map((el: IAlarm, idx) => (
           <li key={idx}>
-            <img src={el.users.userImg} />
+
+            <img src={String(el.users.userImg)} />
+
             <p>{el.alarmMessage}</p>
           </li>
         ))}

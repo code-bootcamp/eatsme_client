@@ -10,12 +10,11 @@ export const FETCH_BOARD = gql`
       startPoint
       endPoint
       createdAt
-      like
       personalMapData {
         area
         section
         restaurantName
-        imgUrl
+        image
         recommend
         location {
           lat

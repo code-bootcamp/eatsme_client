@@ -1,4 +1,4 @@
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 import * as S from "./mainMapStyles";
 
@@ -16,18 +16,22 @@ export default function MainMap(): JSX.Element {
     setArea(e.currentTarget.id);
   };
 
+  useEffect(() => {
+    if (area !== "") localStorage.setItem("startArea", area);
+  }, [area]);
+
   const onMovePage = (direction: string): void => {
     if (direction === "left") {
       setMove(false);
       setIsOpen((prev) => !prev);
       setTimeout(function () {
-        window.location.href = "/eatsMe/routeList";
+        window.location.href = "/eatsMe/popularList";
       }, 1500);
     } else if (direction === "right") {
       setMove(true);
       setIsOpen((prev) => !prev);
       setTimeout(function () {
-        window.location.href = "/eatsMe/popularList";
+        window.location.href = "/eatsMe/routeList";
       }, 1500);
     }
   };
@@ -131,7 +135,7 @@ export default function MainMap(): JSX.Element {
           />
           {/* 인천 */}
           <path
-            id="인천"
+            id="인천시"
             className="common"
             onClick={onModal}
             fill="#cfcfcf"
@@ -147,7 +151,7 @@ export default function MainMap(): JSX.Element {
           />
           {/* 서울 */}
           <path
-            id="서울"
+            id="서울시"
             className="common"
             onClick={onModal}
             fill="#939393"
@@ -274,7 +278,7 @@ c-29 -14 -59 -25 -66 -25 -7 0 -52 -16 -100 -36 -83 -34 -142 -75 -142 -99 0
           />
           {/* 대전 */}
           <path
-            id="대전"
+            id="대전시"
             className="common"
             onClick={onModal}
             fill="#939393"
@@ -316,7 +320,7 @@ c441 -221 552 -325 553 -514 0 -86 -28 -182 -91 -318 -27 -59 -50 -109 -50
           />
           {/* 대구 */}
           <path
-            id="대구"
+            id="대구시"
             className="common"
             onClick={onModal}
             fill="#939393"
@@ -365,7 +369,7 @@ c441 -221 552 -325 553 -514 0 -86 -28 -182 -91 -318 -27 -59 -50 -109 -50
           />
           {/* 울산 */}
           <path
-            id="울산"
+            id="울산시"
             className="common"
             onClick={onModal}
             fill="#989898"
@@ -439,7 +443,7 @@ l-31 -55 1 -155 c0 -187 22 -306 150 -827 46 -188 89 -375 95 -415 29 -185
           />
           {/* 광주 */}
           <path
-            id="광주"
+            id="광주시"
             className="common"
             onClick={onModal}
             fill="#939393"
@@ -451,7 +455,7 @@ l-31 -55 1 -155 c0 -187 22 -306 150 -827 46 -188 89 -375 95 -415 29 -185
           />
           {/* 부산 */}
           <path
-            id="부산"
+            id="부산시"
             className="common"
             onClick={onModal}
             fill="#939393"

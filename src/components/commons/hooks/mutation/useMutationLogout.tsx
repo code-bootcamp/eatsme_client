@@ -1,4 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
+import { IMutation } from "../../../../commons/types/generated/types";
 
 const LOGOUT = gql`
   mutation logout {
@@ -6,8 +7,8 @@ const LOGOUT = gql`
   }
 `;
 
-export const useMutationLogout = (): any => {
-  const logoutUser = useMutation(LOGOUT);
+export const useMutationLogout = (): typeof logoutUser => {
+  const logoutUser = useMutation<Pick<IMutation, "logout">>(LOGOUT);
 
   return logoutUser;
 };

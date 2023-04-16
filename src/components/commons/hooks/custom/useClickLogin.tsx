@@ -2,18 +2,23 @@ import { useRecoilState } from "recoil";
 import { accessTokenState } from "../../../../commons/stores";
 import { UseMutationLogin } from "../mutation/useMutationLogin";
 import { useRouterMovePage } from "./useRouterMovePage";
+import { ILoginAuthInput } from "../../../../commons/types/generated/types";
 
 export interface ILoginFormData {
   email: string;
   password: string;
 }
 
-export const useClickLogin = (): any => {
+interface IUseClickLogin {
+  onClickLogin: (data: ILoginAuthInput) => Promise<void>;
+}
+
+export const useClickLogin = (): IUseClickLogin => {
   const [loginUser] = UseMutationLogin();
   const [, setAccessToken] = useRecoilState(accessTokenState);
   const { routerMovePage } = useRouterMovePage();
 
-  const onClickLogin = async (data: ILoginFormData): Promise<void> => {
+  const onClickLogin = async (data: ILoginAuthInput): Promise<void> => {
     try {
       if (data.email !== "" && data.password !== "") {
         const result = await loginUser({
@@ -24,9 +29,6 @@ export const useClickLogin = (): any => {
             },
           },
         });
-
-        console.log(result);
-
         if (result.data?.login === undefined) {
           alert("로그인에 실패했습니다.");
           return;
@@ -35,7 +37,7 @@ export const useClickLogin = (): any => {
         routerMovePage("/");
       }
     } catch (error) {
-      if (error instanceof Error) alert(error.message);
+      alert("로그인 정보를 확인해 주세요.");
     }
   };
   return { onClickLogin };

@@ -5,17 +5,28 @@ const mq = breakpoints.map((bp) => `@media (max-width: ${bp}px)`);
 export const Container = styled.div`
   position: relative;
   background-color: #f5f5f5;
+  width: 100%;
+  color: black;
 `;
 
 export const TopWrapper = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: 600px;
+  width: 100%;
   padding: 8px;
   ${mq[2]} {
     width: auto;
   }
+`;
+
+export const ModifyImg = styled.img`
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  top: 8px;
+  right: 34px;
+  cursor: pointer;
 `;
 
 export const HeartImg = styled.img`
@@ -130,33 +141,24 @@ export const BottomWrapper = styled.div`
 `;
 
 export const RestaurantBox = styled.div`
-  display: flex;
-  flex-direction: row;
   width: 40%;
 `;
 
-export const RestaurantCircle = styled.div`
-  padding: 2px 0;
-  display: flex;
-  flex-direction: column;
-
-  & > img {
-    width: 12px;
-    height: 42px;
-  }
-
-  & > img:first-of-type {
-    width: 12px;
-    height: 12px;
-  }
-`;
-
 export const RestaurantName = styled.div`
-  margin-left: 10px;
+  display: flex;
+  flex-direction: row;
+
   & > div {
     margin-bottom: 25px;
     font-weight: 500;
     font-size: 14px;
     line-height: 17px;
   }
+`;
+
+export const ImgCircle = styled.img`
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  margin-top: 2px;
 `;

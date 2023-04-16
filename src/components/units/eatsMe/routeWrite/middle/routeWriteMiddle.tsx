@@ -6,7 +6,7 @@ export default function RouteWriteMiddle(): JSX.Element {
     <>
       <Head>
         <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
-        <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=kzTmdjGzc91aQiicRAWjBCpCySY90Cs3AZJ7iVbd"></script>
+        <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=fwJ1lVM3a0680zMo4QJLR1sByJarNOZ66mlgdoPf"></script>
       </Head>
       <S.Container>
         <div id="TMapApp" />

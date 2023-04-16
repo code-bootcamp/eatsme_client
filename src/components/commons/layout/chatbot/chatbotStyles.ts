@@ -131,10 +131,11 @@ export const ChatInput = styled.div`
     background-color: transparent;
   }
 
-  > img {
+  > button {
     width: 32px;
     height: 32px;
-    object-fit: contain;
+    background: url(/chat.webp) no-repeat;
+    background-size: contain;
     cursor: pointer;
   }
 `;

@@ -57,6 +57,9 @@ export const NavBox = styled.div`
     gap: 0 20px;
     width: fit-content;
   }
+  ${mq[0]} {
+    gap: 0 10px;
+  }
   & > a {
     all: unset;
     font-size: 20px;
@@ -65,6 +68,9 @@ export const NavBox = styled.div`
     cursor: pointer;
     ${mq[1]} {
       font-size: 18px;
+    }
+    ${mq[0]} {
+      font-size: 12px;
     }
     :hover {
       border-bottom: 2px solid white;
@@ -85,6 +91,10 @@ export const BtnWrapper = styled.div`
     justify-content: stretch;
     margin-right: 20px;
   }
+  ${mq[1]} {
+    gap: 0 5px;
+    margin-right: 10px;
+  }
 `;
 
 export const LoginBox = styled.div`
@@ -99,6 +109,10 @@ export const LoginBox = styled.div`
     height: 24px;
     object-fit: contain;
     margin-bottom: 2px;
+    ${mq[0]} {
+      width: 20px;
+      height: 20px;
+    }
   }
 `;
 
@@ -109,7 +123,9 @@ export const LoginBtn = styled.button`
   height: 32px;
   color: white;
   margin-left: 4px;
-
+  ${mq[0]} {
+    font-size: 12px;
+  }
   :hover {
     border-bottom: 1px solid white;
   }
@@ -124,7 +140,9 @@ export const JoinBtn = styled.button`
   color: white;
   text-align: center;
   cursor: pointer;
-
+  ${mq[0]} {
+    font-size: 12px;
+  }
   :hover {
     border-bottom: 1px solid white;
   }
@@ -139,7 +157,9 @@ export const UserInfoBtn = styled.button`
   text-align: center;
   color: white;
   cursor: pointer;
-
+  ${mq[0]} {
+    font-size: 12px;
+  }
   :hover {
     border-bottom: 1px solid white;
   }

@@ -10,12 +10,11 @@ export const FETCH_BOARD_BY_EVERY = gql`
       endArea
       startPoint
       endPoint
-      like
       personalMapData {
         restaurantId
         restaurantName
         address
-        imgUrl
+        image
         recommend
         rating
         location {
