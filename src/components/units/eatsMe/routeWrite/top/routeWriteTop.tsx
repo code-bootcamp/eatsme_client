@@ -1,5 +1,5 @@
 import { Modal } from "antd";
-import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import {
   infoWindowClickState,
@@ -9,45 +9,38 @@ import {
   pathState,
   slideSettingState,
 } from "../../../../../commons/stores";
-import { useChangeUploadFile } from "../../../../commons/hooks/custom/useChangeUploadFile";
+import { useChangeRouteWriteInput } from "../../../../commons/hooks/custom/useChangeRouteWriteInput";
 import { useClickCreateBoard } from "../../../../commons/hooks/custom/useClickCreateBoard";
+import { useClickRouteWriteArrow } from "../../../../commons/hooks/custom/useClickRouteWriteArrow";
 import { useClickUpdateBoard } from "../../../../commons/hooks/custom/useClickUpdateBoard";
 import { useEffectTMapLoad } from "../../../../commons/hooks/custom/useEffectTMapLoad";
 import { useMapFindRoad } from "../../../../commons/hooks/custom/useMapFindRoad";
 import { useMapMarker } from "../../../../commons/hooks/custom/useMapMarker";
 import { useSetIsToggle } from "../../../../commons/hooks/custom/useSetIsToggle";
 import { onClickMapSearch } from "../../../../commons/libraries/onClickMapSearch";
+import RouteWriteImg from "../../../../commons/routeWriteImg/routeWriteImg";
 import * as S from "./routeWriteTopStyles";
-
-export interface ISlideSetting {
-  keyword: string[];
-  nowPage: number;
-  isActive: boolean;
-  disabled_next: boolean;
-  disabled_prev: boolean;
-}
 
 export interface IRouteWriteTopProps {
   isEdit: boolean;
 }
 
 export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
+  const [isToggle, changeIsToggle] = useSetIsToggle();
+  const { onChangeInput } = useChangeRouteWriteInput();
   const { onClickCreateBoard } = useClickCreateBoard();
   const { onClickUpdateBoard } = useClickUpdateBoard();
-  const imgRef = useRef<HTMLInputElement>(null);
-  const [image, setImage] = useState<Record<string, string>>({});
-  const [isToggle, changeIsToggle] = useSetIsToggle();
-  const { onChangeUploadFile } = useChangeUploadFile();
+  const { onClickNext, onClickPrev } = useClickRouteWriteArrow();
 
-  const [slideSetting, setSlideSetting] = useRecoilState(slideSettingState);
-  const [path, setPath] = useRecoilState(pathState);
-  const [marker] = useRecoilState(markerState);
+  const [path] = useRecoilState(pathState);
   const [, setMap] = useRecoilState(mapState);
+  const [marker] = useRecoilState(markerState);
+  const [infoWindowClick] = useRecoilState(infoWindowClickState);
   const [infoWindow, setInfoWindow] = useRecoilState(infoWindowState);
+  const [slideSetting, setSlideSetting] = useRecoilState(slideSettingState);
   const { onClickSearch } = onClickMapSearch();
   const { pickMapMarker } = useMapMarker();
   const { axiosFindRoad } = useMapFindRoad();
-  const [infoWindowClick] = useRecoilState(infoWindowClickState);
 
   useEffectTMapLoad(setMap);
 
@@ -90,113 +83,6 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
       }
     }
   }, [infoWindowClick]);
-
-  const onChangeInput =
-    (pageNum: number) => (event: ChangeEvent<HTMLInputElement>) => {
-      if (pageNum === 0) {
-        // 코스 이름 작성
-        setPath((prev: any) => ({
-          ...prev,
-          title: event.target.value,
-        }));
-        setSlideSetting((prev) => ({ ...prev, disabled_next: false }));
-      } else if (event.target.id === "recommend") {
-        // 추천 메뉴 작성
-        setPath((prev: any) => ({
-          ...prev,
-          info: prev.info.map((el: any, idx: number) => {
-            if (pageNum - 1 === idx)
-              return {
-                ...el,
-                recommend: event.target.value,
-              };
-            return { ...el };
-          }),
-        }));
-      } else {
-        // 검색 키워드 작성
-        setSlideSetting((prev) => ({
-          ...prev,
-          keyword: prev.keyword.map((el, idx) => {
-            if (idx === pageNum - 1) {
-              return event.target.value;
-            } else {
-              return el;
-            }
-          }),
-        }));
-      }
-    };
-
-  const onClickNext = (): void => {
-    // infoWindow 및 마커 지우기
-    if (infoWindow.length > 0) {
-      infoWindow[0].setVisible(false);
-    }
-    if (marker.length > 1) {
-      marker.map((el: any) => el.setVisible(false));
-    }
-
-    if (path.info[slideSetting.nowPage].restaurantName === "상호명") {
-      setSlideSetting((prev) => ({
-        ...prev,
-        disabled_next: true,
-      }));
-    }
-    setSlideSetting((prev) => ({
-      ...prev,
-      disabled_prev: false,
-      nowPage: prev.nowPage + 1,
-    }));
-  };
-
-  const onClickPrev = (): void => {
-    // infoWindow 및 마커 지우기
-    if (infoWindow.length > 0) {
-      infoWindow[0].setVisible(false);
-    }
-    if (marker.length > 1) {
-      marker.map((el: any) => el.setVisible(false));
-    }
-
-    if (slideSetting.nowPage - 1 === 0) {
-      setSlideSetting((prev) => ({
-        ...prev,
-        disabled_prev: true,
-      }));
-    }
-    setSlideSetting((prev) => ({
-      ...prev,
-      disabled_next: false,
-      nowPage: prev.nowPage - 1,
-    }));
-  };
-
-  const onClickImg = (event: MouseEvent<HTMLInputElement>): void => {
-    event.stopPropagation();
-    imgRef.current?.click();
-  };
-
-  const onChangeFile = (event: ChangeEvent<HTMLInputElement>): void => {
-    const file = event.target.files?.[0];
-
-    if (file === undefined) return;
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(file);
-    fileReader.onload = (result) => {
-      if (typeof result.target?.result === "string") {
-        setImage((prev) => ({
-          ...prev,
-          [slideSetting.nowPage]: result.target?.result,
-        }));
-        void onChangeUploadFile({
-          file,
-          setPath,
-          nowPage: slideSetting.nowPage - 1,
-        });
-      }
-    };
-  };
 
   return (
     <S.Container>
@@ -263,15 +149,7 @@ export default function RouteWriteTop(props: IRouteWriteTopProps): JSX.Element {
                   />
                 </S.StoreWrap>
               </S.SearchContainer>
-
-              <S.ImgWrap onClick={onClickImg} imgUrl={image[idx] ?? ""}>
-                {image[idx] !== undefined ? (
-                  <img src={image[idx] ?? ""} />
-                ) : (
-                  <></>
-                )}
-                <input type="file" ref={imgRef} onChange={onChangeFile} />
-              </S.ImgWrap>
+              <RouteWriteImg idx={idx} />
               <S.RegisterBtn
                 disabled={slideSetting.isActive}
                 onClick={changeIsToggle}
