@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSetIsToggle } from "../../../../commons/hooks/custom/useSetIsToggle";
-import SubLocationSelector from "../../../../subLocationSelector/subLocationSelector";
+import SubLocationSelector from "../../../../commons/subLocationSelector/subLocationSelector";
 import * as S from "./popularListTopStyles";
-import LocationSelector from "../../../../locationSelector/locationSelector";
+import LocationSelector from "../../../../commons/locationSelector/locationSelector";
 
 export default function PopularListTop(props: any): JSX.Element {
   const [startArea, setStartArea] = useState("");

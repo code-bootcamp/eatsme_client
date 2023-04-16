@@ -10,8 +10,8 @@ import {
   IQueryFetchBoardsByEveryArgs,
 } from "../../../../../commons/types/generated/types";
 import { useSetIsToggle } from "../../../../commons/hooks/custom/useSetIsToggle";
-import LocationSelector from "../../../../locationSelector/locationSelector";
-import SubLocationSelector from "../../../../subLocationSelector/subLocationSelector";
+import LocationSelector from "../../../../commons/locationSelector/locationSelector";
+import SubLocationSelector from "../../../../commons/subLocationSelector/subLocationSelector";
 import * as S from "./routeListTopStyles";
 
 interface IRouteListTopProps {
