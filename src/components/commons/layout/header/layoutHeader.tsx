@@ -10,7 +10,7 @@ import { wrapAsync } from "../../libraries/asyncFunc";
 import { useQuery } from "@apollo/client";
 import { FETCH_LOGIN_USER } from "../../hooks/query/useQueryFetchLoginUser";
 import { IQuery } from "../../../../commons/types/generated/types";
-// import Alarm from "../../alarm/alarm";
+import Alarm from "../../alarm/alarm";
 import { useSetIsToggle } from "../../hooks/custom/useSetIsToggle";
 import { useEffect } from "react";
 
@@ -24,7 +24,7 @@ export default function LayoutHeader(props: IHeader): JSX.Element {
   const { data } = useQuery<Pick<IQuery, "fetchLoginUser">>(FETCH_LOGIN_USER);
   const [, setFetchLoginUser] = useRecoilState(fetchLoginUserState);
   const { onClickLogout } = useClickLogout();
-  const [, changeIsToggle] = useSetIsToggle();
+  const [isToggle, changeIsToggle] = useSetIsToggle();
 
   useEffect(() => {
     if (data?.fetchLoginUser !== undefined) {
@@ -54,10 +54,9 @@ export default function LayoutHeader(props: IHeader): JSX.Element {
             <S.UserInfoBtn onClick={changeIsToggle}>
               {data?.fetchLoginUser.nickname} 님
             </S.UserInfoBtn>
-            {/* 알람의 수정되면 풀기 */}
-            {/* {data?.fetchLoginUser.alarms.length !== 0 && (
-              <Alarm isToggle={isToggle} data={data?.fetchLoginUser} />
-            )} */}
+            {data?.fetchLoginUser.alarms.length !== 0 && (
+              <Alarm isToggle={isToggle} changeIsToggle={changeIsToggle} />
+            )}
           </S.BtnWrapper>
         </S.Wrapper>
       ) : (
