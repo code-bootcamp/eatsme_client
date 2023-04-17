@@ -1,10 +1,12 @@
 import { useQuery } from "@apollo/client";
 import { IQuery } from "../../../../../../commons/types/generated/types";
+import { useClickDeleteReservation } from "../../../../../commons/hooks/custom/useClickDeleteReservation";
 import { FETCH_LOGIN_USER } from "../../../../../commons/hooks/query/useQueryFetchLoginUser";
 import * as S from "./reserveListMiddleStyles";
 
 export default function ReserveListMiddle(): JSX.Element {
   const { data } = useQuery<Pick<IQuery, "fetchLoginUser">>(FETCH_LOGIN_USER);
+  const { onClickDeleteReservation } = useClickDeleteReservation();
 
   return (
     <>
@@ -34,10 +36,15 @@ export default function ReserveListMiddle(): JSX.Element {
                     <S.Date>일정 : {el.time}</S.Date>
                     <S.Time>{el.reservation_time}:00</S.Time>
                   </S.ScheduleCont>
-                  {/* <S.BtnWrap>
-                    <S.EditBtn>수정</S.EditBtn>
-                    <S.EditBtn>취소</S.EditBtn>
-                  </S.BtnWrap> */}
+                  <S.BtnWrap>
+                    <S.EditBtn
+                      onClick={() => {
+                        void onClickDeleteReservation(el.restaurant_id);
+                      }}
+                    >
+                      취소
+                    </S.EditBtn>
+                  </S.BtnWrap>
                 </S.ScheduleBox>
               </S.ReserveBox>
             </S.Wrapper>
