@@ -18,15 +18,15 @@ export default function ReserveListMiddle(): JSX.Element {
                 <S.Align>
                   <S.Img src="/marker_or.webp" />
                   <span>
-                    {data.fetchLoginUser.restaurant?.[idx].address !== null
-                      ? data.fetchLoginUser.restaurant?.[idx].address
+                    {data.fetchLoginUser.restaurant?.[idx]?.address !== null
+                      ? data.fetchLoginUser.restaurant?.[idx]?.address
                       : "등록된 주소가 없습니다."}
                   </span>
                 </S.Align>
                 <S.Align>
                   <S.Img src="/store.webp" />
                   <span>
-                    {data.fetchLoginUser.restaurant?.[idx].restaurantName}
+                    {data.fetchLoginUser.restaurant?.[idx]?.restaurantName}
                   </span>
                 </S.Align>
                 <S.ScheduleBox>
