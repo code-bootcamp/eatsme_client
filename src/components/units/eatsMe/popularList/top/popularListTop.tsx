@@ -20,7 +20,7 @@ export default function PopularListTop(props: any): JSX.Element {
     if (startArea !== "" && startPoint !== "") {
       const showList = async (): Promise<void> => {
         const result = await axios.get(
-          `https://jjjbackendclass.shop/info/road/restaurant?area=${startArea}&section=${startPoint}`
+          `https://sit-woo.store/info/road/restaurant?area=${startArea}&section=${startPoint}`
         );
         props.setLocation(result);
       };
