@@ -2,6 +2,6 @@ import { useWithAuth } from "../../../src/components/commons/hooks/custom/useWit
 import RouteWrite from "../../../src/components/units/eatsMe/routeWrite/routeWrite";
 
 export default function RouteWritePage(): JSX.Element {
-  // useWithAuth();
+  useWithAuth();
   return <RouteWrite isEdit={false} />;
 }

@@ -1,4 +1,4 @@
-schema: https://jjjbackendclass.shop/graphql
+schema: https://sit-woo.store/graphql
 generates:
   ./src/commons/types/generated/types.ts:
     plugins:

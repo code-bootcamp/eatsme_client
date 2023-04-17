@@ -4,11 +4,6 @@ import { UseMutationLogin } from "../mutation/useMutationLogin";
 import { useRouterMovePage } from "./useRouterMovePage";
 import { ILoginAuthInput } from "../../../../commons/types/generated/types";
 
-export interface ILoginFormData {
-  email: string;
-  password: string;
-}
-
 interface IUseClickLogin {
   onClickLogin: (data: ILoginAuthInput) => Promise<void>;
 }

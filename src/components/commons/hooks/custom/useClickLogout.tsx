@@ -2,10 +2,9 @@ import { useRecoilState } from "recoil";
 import { accessTokenState } from "../../../../commons/stores";
 import { useMutationLogout } from "../mutation/useMutationLogout";
 import { useRouterMovePage } from "./useRouterMovePage";
-import { IMutation } from "../../../../commons/types/generated/types";
 
 interface IUseClickLogout {
-  onClickLogout: (data: IMutation) => Promise<void>;
+  onClickLogout: () => Promise<void>;
 }
 
 export const useClickLogout = (): IUseClickLogout => {

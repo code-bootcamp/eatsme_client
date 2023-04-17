@@ -31,7 +31,7 @@ export default function Chatbot(props: IChatbot): JSX.Element {
     try {
       const result = await axios({
         method: "POST",
-        url: "https://jjjbackendclass.shop/info/channel",
+        url: "https://sit-woo.store/info/channel",
         data: {
           question: inputValue,
         },
