@@ -1,6 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
+import { ILoginAuthInput } from "../../../../../commons/types/generated/types";
 import { useClickLogin } from "../../../../commons/hooks/custom/useClickLogin";
 import { useRouterMovePage } from "../../../../commons/hooks/custom/useRouterMovePage";
 import { wrapAsync } from "../../../../commons/libraries/asyncFunc";
@@ -11,17 +12,17 @@ export default function LoginMiddle(): JSX.Element {
   const router = useRouter();
   const { onClickMovePage } = useRouterMovePage();
   const { onClickLogin } = useClickLogin();
-  const { register, handleSubmit, formState } = useForm({
+  const { register, handleSubmit, formState } = useForm<ILoginAuthInput>({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
 
   const onClickKakao = (): void => {
-    void router.push("https://jjjbackendclass.shop/graphql/login/kakao");
+    void router.push("https://sit-woo.store/graphql/login/kakao");
   };
 
   const onClickGoogle = (): void => {
-    void router.push("https://jjjbackendclass.shop/graphql/login/google");
+    void router.push("https://sit-woo.store/graphql/login/google");
   };
 
   return (
