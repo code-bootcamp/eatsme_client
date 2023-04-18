@@ -18,12 +18,11 @@ export const FETCH_LOGIN_USER = gql`
         reservation_time
         restaurant_id
       }
+      alarms {
+        id
+        alarmMessage
+        isAlarm
+      }
     }
   }
 `;
-// alarms {
-//   alarmMessage
-//   user {
-//     userImg
-//   }
-// }
