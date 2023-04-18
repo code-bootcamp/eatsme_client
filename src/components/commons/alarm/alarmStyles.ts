@@ -37,21 +37,25 @@ export const AlarmList = styled.div`
   margin-top: 15px;
   border-top: 1px solid #e0e0e0;
   li {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0 8px;
     padding: 9px 0;
     list-style: none;
     border-bottom: 1px solid #e0e0e0;
-    img {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-    }
     p {
       font-size: 12px;
       line-height: 16px;
       color: #797979;
+    }
+    img {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
     }
   }
 `;
