@@ -61,10 +61,7 @@ export default function ReserveMiddle(): JSX.Element {
     if (value.toDate() > today) {
       setSelectedDate(value);
       setIsModalOpen(true);
-      setValue(
-        "time",
-        selectedDate !== null ? selectedDate.format("YYYY.MM.DD") : "날짜"
-      );
+      setValue("time", value.format("YYYY.MM.DD"));
     }
   };
   return (

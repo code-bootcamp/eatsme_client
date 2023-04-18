@@ -1,3 +1,4 @@
+import { Modal } from "antd";
 import { IReserveFormData } from "../../../units/eatsMe/reserve/middle/reserveMiddle";
 import { useMutationCreateReservation } from "../mutation/useMutationCreateReservation";
 import { useRouterMovePage } from "./useRouterMovePage";
@@ -13,7 +14,6 @@ export const useClickReserve = (): IUseClickReserve => {
   const onClickReserve = async (data: IReserveFormData): Promise<void> => {
     try {
       const localData = JSON.parse(String(localStorage.getItem("reserve")));
-
       await createReservation({
         variables: {
           createReservationInput: {
@@ -25,6 +25,20 @@ export const useClickReserve = (): IUseClickReserve => {
         },
       });
       routerMovePage("/eatsMe/popularList");
+      Modal.success({
+        title: "예약이 완료되엇습니다",
+        okText: "확인",
+        icon: null,
+        onOk() {
+          routerMovePage("/eatsMe/popularList");
+        },
+        onCancel() {
+          routerMovePage("/eatsMe/popularList");
+        },
+        okButtonProps: {
+          style: { backgroundColor: "#fbb240", color: "white" },
+        },
+      });
     } catch (error) {
       if (error instanceof Error) alert(error.message);
     }
