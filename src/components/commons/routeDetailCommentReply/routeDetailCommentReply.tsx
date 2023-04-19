@@ -98,7 +98,7 @@ export default function RouteDetailCommentReply(
                 src={
                   fetchLoginUser.userImg !== null
                     ? `https://storage.googleapis.com/${String(
-                        props.data.user?.userImg
+                        fetchLoginUser.userImg
                       )}`
                     : "/userImg_small.webp"
                 }
