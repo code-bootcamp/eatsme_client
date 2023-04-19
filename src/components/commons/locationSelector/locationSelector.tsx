@@ -17,6 +17,7 @@ export default function LocationSelector(
     "광주시",
     "대전시",
     "울산시",
+    "세종시",
     "경기도",
     "강원도",
     "충청북도",
