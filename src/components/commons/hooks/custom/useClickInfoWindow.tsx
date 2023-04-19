@@ -22,6 +22,7 @@ export const useClickInfoWindow = (): IUseClickInfoWindow => {
     광주: "광주시",
     대전: "대전시",
     울산: "울산시",
+    세종시: "세종시",
     경기: "경기도",
     강원: "강원도",
     충북: "충청북도",
@@ -53,7 +54,10 @@ export const useClickInfoWindow = (): IUseClickInfoWindow => {
         if (idx === slideSetting.nowPage - 1)
           return {
             ...el,
-            section: data.middleAddrName,
+            section:
+              data.upperAddrName === "세종시"
+                ? data.lowerAddrName
+                : data.middleAddrName,
             area: area[data.upperAddrName],
             restaurantName: data.name,
             location: {

@@ -24,16 +24,15 @@ export const useClickReserve = (): IUseClickReserve => {
           },
         },
       });
-      routerMovePage("/eatsMe/popularList");
       Modal.success({
-        title: "예약이 완료되엇습니다",
+        title: "예약이 완료되었습니다",
         okText: "확인",
         icon: null,
         onOk() {
-          routerMovePage("/eatsMe/popularList");
+          routerMovePage("/eatsMe/routeList");
         },
         onCancel() {
-          routerMovePage("/eatsMe/popularList");
+          routerMovePage("/eatsMe/routeList");
         },
         okButtonProps: {
           style: { backgroundColor: "#fbb240", color: "white" },
