@@ -14,19 +14,13 @@ export const useFetchDataSet = (): IUseFetchDataSet => {
   const fetchDataSet = (args: IFetchDataSet): void => {
     const { personalMapData, id, __typename, ...data } = args.data;
     if (personalMapData !== undefined && personalMapData !== null) {
-      const settingPersonalMapData = [...personalMapData];
-      const lastObj = settingPersonalMapData.pop();
-      settingPersonalMapData.splice(1, 0, lastObj);
-
-      const newPersonalMapData = settingPersonalMapData.map(
-        (obj: any, idx: number) => {
-          const { image, ...rest } = obj;
-          return {
-            ...rest,
-            imgUrl: image ?? "",
-          };
-        }
-      );
+      const newPersonalMapData = personalMapData.map((obj: any) => {
+        const { image, ...rest } = obj;
+        return {
+          ...rest,
+          imgUrl: image ?? "",
+        };
+      });
       args.setPath((prev: any) => ({
         ...prev,
         ...data,
