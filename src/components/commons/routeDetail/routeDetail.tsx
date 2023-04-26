@@ -25,6 +25,7 @@ export default function RouteDetail(props: IRouteDetailProps): JSX.Element {
   const { data: likeData } =
     useQuery<Pick<IQuery, "fetchMyLikeBoard">>(FETCH_MY_LIKE_BOARD);
   const [accessToken] = useRecoilState(accessTokenState);
+
   const onClickLike = (event: MouseEvent<HTMLImageElement>): void => {
     if (accessToken === "") {
       return;
@@ -105,16 +106,31 @@ export default function RouteDetail(props: IRouteDetailProps): JSX.Element {
           <S.DivideLine></S.DivideLine>
           <S.BottomWrapper>
             <S.RestaurantBox>
-              {props.data?.personalMapData?.map((el, idx) => (
-                <S.RestaurantName key={idx}>
-                  <S.ImgCircle src="/routeCircle_first.webp" />
-                  <div>
-                    {`${el.restaurantName ?? ""} ${
-                      el.recommend !== "" ? "|" : ""
-                    } ${el.recommend ?? ""}`}
-                  </div>
-                </S.RestaurantName>
-              ))}
+              {props.data?.personalMapData?.map((el, idx) => {
+                if (idx === 1) {
+                  return null;
+                }
+                return (
+                  <S.RestaurantName key={idx}>
+                    <S.ImgCircle src="/routeCircle_first.webp" />
+                    <div>
+                      {`${el.restaurantName ?? ""} ${
+                        el.recommend !== "" ? "|" : ""
+                      } ${el.recommend ?? ""}`}
+                    </div>
+                  </S.RestaurantName>
+                );
+              })}
+              <S.RestaurantName>
+                <S.ImgCircle src="/routeCircle_first.webp" />
+                <div>
+                  {`${props.data?.personalMapData?.[1]?.restaurantName ?? ""} ${
+                    props.data?.personalMapData?.[1]?.recommend !== ""
+                      ? "|"
+                      : ""
+                  } ${props.data?.personalMapData?.[1]?.recommend ?? ""}`}
+                </div>
+              </S.RestaurantName>
             </S.RestaurantBox>
             <RouteDetailComment data={props.data} />
           </S.BottomWrapper>

@@ -12,7 +12,7 @@ export const useClickJoin = (): IUseClickJoin => {
 
   const onClickJoin = async (data: ICreateUserInput): Promise<void> => {
     try {
-      const result = await createUser({
+      await createUser({
         variables: {
           createUserInput: {
             email: data.email,
@@ -21,7 +21,6 @@ export const useClickJoin = (): IUseClickJoin => {
           },
         },
       });
-      console.log(result);
       routerMovePage("/eatsMe/login");
       alert("가입을 환영합니다!");
     } catch (error) {
