@@ -40,7 +40,7 @@ eatsme.site
 
 #### 구현 기능
 
-게시글(맛집 코스) 작성 / 수정 / 삭제 / 조회 / 댓글
+# 게시글(맛집 코스) 작성 / 수정 / 삭제 / 조회 / 댓글
 
 ![루트조회](https://user-images.githubusercontent.com/119851517/234808225-90d74de1-95a3-4fa9-b7fd-ac57cd5fc31c.gif)
 ![작성압축](https://user-images.githubusercontent.com/119851517/234807907-a87f10de-f1ad-4521-82a3-399c7f794071.gif)
