@@ -1,7 +1,7 @@
 
-# 잇츠미 eatsMe
+#잇츠미 eatsMe
 
-####홈페이지
+####주소
 eatsme.site
 
 ####소개
